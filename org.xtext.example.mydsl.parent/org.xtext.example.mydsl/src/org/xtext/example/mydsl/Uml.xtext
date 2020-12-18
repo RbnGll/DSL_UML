@@ -20,7 +20,9 @@ Relation:
 	StrongAggregation | Association;
 
 	
-	
+Heritage:
+	'heritage' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+;
 
 
 // OBJECTS
@@ -48,6 +50,23 @@ Function: visibility=VISIBILITY returnType=TYPE name=STRING '('
 ')' ';';
 
 
+AbstractClass: 'abstract' class=Class;
+
+
+// TODO : voir si on peut avoir des fonctions et des paramètres dans un énum
+// Ou si constante peut prendre une valeur en paramètre
+Enum: 'enum' name=STRING '{' 
+	(params+=EnumConstante)+	
+'}';
+
+
+EnumConstante: name=STRING ';';
+
+// PACKAGE
+// TODO :: Revoir la définition pour class & package
+Package: 'package' '{' 
+	(packageName+=STRING ',')+
+'}';
 
 
 
