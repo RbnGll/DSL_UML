@@ -1,0 +1,9 @@
+grammar org.xtext.example.mydsl.Uml with org.eclipse.xtext.common.Terminals
+
+generate uml "http://www.xtext.org/example/mydsl/Uml"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
