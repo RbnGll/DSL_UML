@@ -17,11 +17,25 @@ Link:
 
 
 Relation:
-	StrongAggregation | Association;
+	StrongAggregation | Association;
 
+	
+Implementation: 
+	'implementation' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+;
 	
 Heritage:
 	'heritage' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+;
+
+
+// Voir si on a d'autres paramètres ou des paramètres vides
+Association: 
+	'association' '(' nameClass1=STRING ',' nameClass2=STRING ',' nameLiaison=STRING ',' quantity1=INT ',' quantity2=INT ')' ';'
+;
+
+StrongAggregation:
+	'strongAssociation' '(' nameClass1=STRING ',' nameClass2=STRING ',' nameLiaison=STRING ',' quantity2=INT ')' ';'
 ;
 
 
@@ -31,7 +45,8 @@ Object:
 	
 
 // Need to review, think that parameter / function can be optional. 
-Class: 'class' name=STRING '{'
+
+ClassContent: name=STRING '{'
 	'parameter' '{'
 		(params+=Parameter)+ 
 	'}'
@@ -41,20 +56,25 @@ Class: 'class' name=STRING '{'
 '}'
 ;
 
-Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=STRING ';';
-// Think to the keyword static that can be add at the beginning 
-
-
-Function: visibility=VISIBILITY returnType=TYPE name=STRING '(' 
-	(params+=Parameter)+ // TODO :: à revoir car on garde ici que le type et le nom du parametre (pas la visilibité et tout le tralala)	
-')' ';';
-
+Class: 'class' content=ClassContent;
 
 AbstractClass: 'abstract' class=Class;
 
+// https://www.uml-diagrams.org/class-reference.html
+Interface: 'interface' content=ClassContent;
 
-// TODO : voir si on peut avoir des fonctions et des paramètres dans un énum
-// Ou si constante peut prendre une valeur en paramètre
+
+
+Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=STRING ';';
+// Think to the keyword static that can be add at the beginning 
+
+FunctionParameter: modifier=MODIFIER type=TYPE name=STRING ';';
+
+Function: visibility=VISIBILITY returnType=TYPE name=STRING '(' 
+	(params+=FunctionParameter)+ 	
+')' ';';
+
+
 Enum: 'enum' name=STRING '{' 
 	(params+=EnumConstante)+	
 '}';
@@ -62,9 +82,11 @@ Enum: 'enum' name=STRING '{'
 
 EnumConstante: name=STRING ';';
 
+
+
 // PACKAGE
-// TODO :: Revoir la définition pour class & package
-Package: 'package' '{' 
+// TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
+Package: 'package' name=STRING '{' 
 	(packageName+=STRING ',')+
 '}';
 
