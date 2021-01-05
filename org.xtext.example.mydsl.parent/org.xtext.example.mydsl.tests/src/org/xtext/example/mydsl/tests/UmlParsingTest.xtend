@@ -70,6 +70,20 @@ class UmlParsingTest {
 	}
 	
 	@Test
+	def void emptyClassTest(){
+		result = parseHelper.parse('''
+			abstract class EmptyClass {
+				parameter {
+				} 
+				function {
+				}
+			}''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	
+	@Test
 	def void interfaceTest(){
 		result = parseHelper.parse('''
 			interface NomInterface {
@@ -103,6 +117,14 @@ class UmlParsingTest {
 				NomClass,
 				AutreClass
 			}
+			''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void superpackageTest(){
+		result = parseHelper.parse('''
 			package superPackage {
 				nomPackage
 			}
