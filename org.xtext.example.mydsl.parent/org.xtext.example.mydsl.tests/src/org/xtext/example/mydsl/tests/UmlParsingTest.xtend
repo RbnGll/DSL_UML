@@ -26,7 +26,7 @@ class UmlParsingTest {
 					# const String b;
 					-  int c;
 			} 
-			fonction {
+			function {
 				+ void test();
 			}
 			}

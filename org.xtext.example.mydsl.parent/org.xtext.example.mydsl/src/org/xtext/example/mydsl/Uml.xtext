@@ -49,7 +49,7 @@ Object:
 // TODO :: remove double " for class name
 ClassContent: name=ID '{'
 	'parameter' '{'
-		(params+=Parameter)+ 
+		(params+=DefinedParameter)+ 
 	'}'
 	'function' '{'
 		(functions+=Function)+
@@ -66,8 +66,17 @@ Interface: 'interface' content=ClassContent;
 
 
 
-Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=ID ';';
-// Think to the keyword static that can be add at the beginning 
+
+// Definition of a parameter 
+DefinedParameter: StaticParameter | ClassicParameter;
+
+StaticParameter: 'static' parameter=ClassicParameter;
+
+ClassicParameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=ID ';';
+
+
+
+ 
 
 FunctionParameter: modifier=MODIFIER type=TYPE name=ID';';
 
