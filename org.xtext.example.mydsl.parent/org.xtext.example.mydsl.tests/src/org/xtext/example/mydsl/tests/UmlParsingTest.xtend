@@ -103,7 +103,7 @@ class UmlParsingTest {
 	@Test
 	def void strongAggregationTest(){
 		result = parseHelper.parse('''
-		heritage(NomClass, AutreClass, nomLiaison, 10);
+		strongAssociation(NomClass, AutreClass, nomLiaison, 10);
 		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
