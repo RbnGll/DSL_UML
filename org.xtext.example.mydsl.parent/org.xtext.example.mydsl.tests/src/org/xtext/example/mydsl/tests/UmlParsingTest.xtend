@@ -17,9 +17,6 @@ class UmlParsingTest {
 	@Inject extension ValidationTestHelper
 	Program result;
 	
-	
-	// TODO :: Need a test with at least 2 parameter in a function --> think a bug
-	
 	//OBJECTS
 	@Test
 	def void classTest() {
@@ -34,7 +31,40 @@ class UmlParsingTest {
 					+ void test();
 				}
 		}
-''')
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void testClassWithFunctionMultipleParameters () {
+		result = parseHelper.parse('''
+			class NomClass {
+				parameter {
+					+ static int a;
+					# const String b;
+					- int c;
+				} 
+				function {
+					+ void test(int a, int b);
+					- long calcul(long test_1, string result_b);
+				}
+		}
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void testInterface() {
+		result = parseHelper.parse('''
+			interface Runner {
+				parameter {}
+				function {
+					+ void run();
+				}
+			}
+		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
 	}
