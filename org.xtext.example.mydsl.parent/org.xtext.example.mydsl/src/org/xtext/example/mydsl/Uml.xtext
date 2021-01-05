@@ -44,17 +44,16 @@ Object:
 	Class | AbstractClass | Interface | Enum;
 	
 
-// Need to review, think that parameter / function can be optional. 
 
-// TODO :: remove double " for class name
+
 
 // Keep the parameter and the function
 ClassContent: name=ID '{'
 	'parameter' '{'
-		(params+=DefinedParameter)+ 
+		(params+=DefinedParameter)*
 	'}'
 	'function' '{'
-		(functions+=Function)+
+		(functions+=Function)*
 	'}'
 '}'
 ;
@@ -80,11 +79,11 @@ ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';'
 
  
 
-FunctionParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID';';
+FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
 
 // Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
-	(params+=FunctionParameter)* 	
+	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
 
