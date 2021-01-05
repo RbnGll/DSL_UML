@@ -31,8 +31,20 @@ class UmlParsingTest {
 				fonction {
 					+ void test();
 				}
-			}
-''')
+			}''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void emptyClassTest(){
+		result = parseHelper.parse('''
+			abstract class EmptyClass {
+				parameter {
+				} 
+				fonction {
+				}
+			}''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
 	}
