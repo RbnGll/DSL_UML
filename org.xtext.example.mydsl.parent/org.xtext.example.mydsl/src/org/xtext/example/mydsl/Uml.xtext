@@ -21,11 +21,11 @@ Relation:
 
 	
 Implementation: 
-	'implementation' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+	'implementation' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
 ;
 	
 Heritage:
-	'heritage' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+	'heritage' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
 ;
 
 
@@ -100,7 +100,7 @@ EnumConstante: name=ID ';';
 // PACKAGE
 // TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
 Package: 'package' name=ID '{' 
-	(packageName+=ID ',')+
+	(packageName+=ID ','?)+
 '}';
 
 
