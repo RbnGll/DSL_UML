@@ -17,6 +17,10 @@ class UmlParsingTest {
 	@Inject extension ValidationTestHelper
 	Program result;
 	
+	
+	// TODO :: Need a test with at least 2 parameter in a function --> think a bug
+	
+	//OBJECTS
 	@Test
 	def void classTest() {
 		result = parseHelper.parse('''
@@ -25,13 +29,94 @@ class UmlParsingTest {
 					+ static int a;
 					# const String b;
 					-  int c;
-			} 
-			function {
-				+ void test();
-			}
-			}
+				} 
+				function {
+					+ void test();
+				}
+		}
 ''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
 	}
+	
+	@Test
+	def void interfaceTest(){
+		result = parseHelper.parse('''
+			interface NomInterface {
+				parameter {
+					+ static int a;
+				} 
+				function {
+					+ void test();
+				}
+			}''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void enumTest(){
+		result = parseHelper.parse('''
+			enum NomEnum {
+				FOO;
+				BAR;
+			}''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	//PACKAGE
+	@Test
+	def void packageTest(){
+		result = parseHelper.parse('''
+			package nomPackage {
+				NomClass,
+				AutreClass
+			}
+			package superPackage {
+				nomPackage
+			}
+			''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	//LINK
+	@Test
+	def void heritageTest(){
+		result = parseHelper.parse('''
+		heritage(NomClass, ParentClass);
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void implementationTest(){
+		result = parseHelper.parse('''
+		implementation(NomClass, ParentClass);
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void strongAggregationTest(){
+		result = parseHelper.parse('''
+		heritage(NomClass, AutreClass, nomLiaison, 10);
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void associationTest(){
+		result = parseHelper.parse('''
+		association(NomClass, AutreClass, nomLiaison, 10, 10);
+		''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	
 }
