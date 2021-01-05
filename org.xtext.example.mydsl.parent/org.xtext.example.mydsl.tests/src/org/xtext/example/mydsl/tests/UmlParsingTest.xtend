@@ -18,6 +18,8 @@ class UmlParsingTest {
 	Program result;
 	
 	
+	// TODO :: Need a test with at least 2 parameter in a function --> think a bug
+	
 	//OBJECTS
 	@Test
 	def void classTest() {
@@ -28,7 +30,7 @@ class UmlParsingTest {
 					# const String b;
 					-  int c;
 				} 
-				fonction {
+				function {
 					+ void test();
 				}
 			}''')
@@ -57,7 +59,7 @@ class UmlParsingTest {
 				parameter {
 					+ static int a;
 				} 
-				fonction {
+				function {
 					+ void test();
 				}
 			}''')
