@@ -49,6 +49,7 @@ class UmlParsingTest {
 		result.assertNoIssues
 	}
 	
+	
 	@Test
 	def void interfaceTest(){
 		result = parseHelper.parse('''
