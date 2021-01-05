@@ -21,7 +21,7 @@ class UmlParsingTest {
 	def void classTest() {
 		result = parseHelper.parse('''
 			abstract class NomClass {
-				parametre {
+				parameter {
 					+ static int a;
 					# const String b;
 					-  int c;

@@ -46,7 +46,8 @@ Object:
 
 // Need to review, think that parameter / function can be optional. 
 
-ClassContent: name=STRING '{'
+// TODO :: remove double " for class name
+ClassContent: name=ID '{'
 	'parameter' '{'
 		(params+=Parameter)+ 
 	'}'
@@ -65,28 +66,28 @@ Interface: 'interface' content=ClassContent;
 
 
 
-Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=STRING ';';
+Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=ID ';';
 // Think to the keyword static that can be add at the beginning 
 
-FunctionParameter: modifier=MODIFIER type=TYPE name=STRING ';';
+FunctionParameter: modifier=MODIFIER type=TYPE name=ID';';
 
-Function: visibility=VISIBILITY returnType=TYPE name=STRING '(' 
+Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter)+ 	
 ')' ';';
 
 
-Enum: 'enum' name=STRING '{' 
+Enum: 'enum' name=ID '{' 
 	(params+=EnumConstante)+	
 '}';
 
 
-EnumConstante: name=STRING ';';
+EnumConstante: name=ID ';';
 
 
 
 // PACKAGE
 // TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
-Package: 'package' name=STRING '{' 
+Package: 'package' name=ID '{' 
 	(packageName+=STRING ',')+
 '}';
 
