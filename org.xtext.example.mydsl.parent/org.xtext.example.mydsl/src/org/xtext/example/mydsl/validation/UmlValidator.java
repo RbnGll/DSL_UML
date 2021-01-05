@@ -3,6 +3,9 @@
  */
 package org.xtext.example.mydsl.validation;
 
+import org.eclipse.xtext.validation.Check;
+import org.xtext.example.mydsl.uml.ClassContent;
+import org.xtext.example.mydsl.uml.UmlPackage;
 
 /**
  * This class contains custom validation rules. 
@@ -10,16 +13,15 @@ package org.xtext.example.mydsl.validation;
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
  */
 public class UmlValidator extends AbstractUmlValidator {
+	public static final String INVALID_NAME = "invalidName";
 	
-//	public static final String INVALID_NAME = "invalidName";
-//
-//	@Check
-//	public void checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.getName().charAt(0))) {
-//			warning("Name should start with a capital",
-//					UmlPackage.Literals.GREETING__NAME,
-//					INVALID_NAME);
-//		}
-//	}
+	@Check
+	public void checkClassNameStartsWithCapital(ClassContent c) {
+	    if (!Character.isUpperCase(c.getName().charAt(0))) {
+	        warning("Name should start with a capital",
+	            UmlPackage.Literals.CLASS_CONTENT__NAME,
+	            INVALID_NAME);
+	    }
+	}
 	
 }
