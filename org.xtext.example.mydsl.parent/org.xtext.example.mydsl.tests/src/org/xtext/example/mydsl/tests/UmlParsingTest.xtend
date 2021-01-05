@@ -71,6 +71,14 @@ class UmlParsingTest {
 				NomClass,
 				AutreClass
 			}
+			''')
+		Assertions.assertNotNull(result)
+		result.assertNoIssues
+	}
+	
+	@Test
+	def void superpackageTest(){
+		result = parseHelper.parse('''
 			package superPackage {
 				nomPackage
 			}
