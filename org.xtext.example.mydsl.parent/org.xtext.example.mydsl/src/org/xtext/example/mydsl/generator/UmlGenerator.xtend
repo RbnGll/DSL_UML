@@ -8,8 +8,12 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.uml.Class
+import org.xtext.example.mydsl.uml.ClassContent
 import com.google.inject.Inject
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.xtext.example.mydsl.uml.DefinedParameter
+import org.eclipse.emf.common.util.EList
+import org.xtext.example.mydsl.uml.Function
 
 /**
  * Generates code from your model files on save.
@@ -37,9 +41,39 @@ class UmlGenerator extends AbstractGenerator {
 			package «c.eContainer.fullyQualifiedName»;
 		«ENDIF»
 		
-		public class «» {
-			
+		public class «c.content.name» {
+			«IF c.content !== null »
+			«c.content.compile»
+			«ENDIF»
 		}
 	'''
+	private def compile (ClassContent cc) '''
+		«IF cc.params !== null && !cc.params.empty»
+			« cc.params.compile»
+		«ENDIF»
+		
+		«IF cc.functions !== null && !cc.functions.empty»
+		«cc.functions.compile»
+		«ENDIF»
+	'''
+	
+	
+	// TODO
+	private def compile (EList<?> p) '''
+		«IF p !== null && p.class.toString === 'EList<DefinedParameter>'»
+			«IF !p.empty»
+				/*TODO*/
+			«ENDIF»
+		«ENDIF»
+		
+		«IF p !== null && p.class.toString === 'EList<Function>'»
+			«IF !p.empty»
+				/*TODO*/
+			«ENDIF»
+		«ENDIF»
+	'''
+	
+	
+	
 		
 }
