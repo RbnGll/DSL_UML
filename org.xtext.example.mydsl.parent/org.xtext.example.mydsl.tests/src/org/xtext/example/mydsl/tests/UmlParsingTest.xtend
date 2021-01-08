@@ -170,5 +170,4 @@ class UmlParsingTest {
 		result.assertNoIssues
 	}
 	
-	
 }

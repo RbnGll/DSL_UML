@@ -3,7 +3,23 @@
  */
 package org.xtext.example.mydsl.ui.outline;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.inject.Inject;
+
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.xtext.AbstractElement;
+import org.eclipse.xtext.ui.PluginImageHelper;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
+import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode;
+
+import org.xtext.example.mydsl.uml.Class;
+import org.xtext.example.mydsl.uml.Enum;
+import org.xtext.example.mydsl.uml.Interface;
+
+
 
 /**
  * Customization of the default outline structure.
@@ -11,5 +27,32 @@ import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
  * See https://www.eclipse.org/Xtext/documentation/310_eclipse_support.html#outline
  */
 public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
+
+//	protected void _createChildren(DocumentRootNode parentNode, 
+//			Class c) {
+//		for (AbstractElement element : c.getElements()) {
+//			createNode(parentNode, element);
+//		}
+//	}
+
+	public Object _text(Class c) {
+		return "Class";
+	}
+
+	public Object _text(Enum c) {
+		return "Enum";
+	}
+	
+	public Object _text(Interface c) {
+		return "Interface";
+	}
+
+	
+	@Inject
+	private PluginImageHelper imageHelper;
+	
+	public Image _image(Class c) {
+		return imageHelper.getImage("assets/metadata.png");
+	}
 
 }
