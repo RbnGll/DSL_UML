@@ -5,6 +5,7 @@ package org.xtext.example.mydsl.validation;
 
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.ClassContent;
+import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
 /**
@@ -14,6 +15,7 @@ import org.xtext.example.mydsl.uml.UmlPackage;
  */
 public class UmlValidator extends AbstractUmlValidator {
 	public static final String INVALID_NAME = "invalidName";
+	public static final int INVALID_QUANTITY = -1;
 	
 	@Check
 	public void checkClassNameStartsWithCapital(ClassContent c) {
@@ -22,6 +24,15 @@ public class UmlValidator extends AbstractUmlValidator {
 	            UmlPackage.Literals.CLASS_CONTENT__NAME,
 	            INVALID_NAME);
 	    }
+	}
+	
+	@Check
+	public void checkPoisitiveIntOnRelation(Relation r) {
+		if(r.getQuantity2()<0) {
+			warning("Quantity should be positive", 
+					UmlPackage.Literals.RELATION__QUANTITY2,
+					INVALID_QUANTITY);
+		}
 	}
 	
 }
