@@ -21,21 +21,21 @@ Relation:
 
 	
 Implementation: 
-	'implementation' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+	'implementation' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
 ;
 	
 Heritage:
-	'heritage' '(' nameClass1=Object ',' nameClass2=Object ')' ';'
+	'heritage' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
 ;
 
 
 // Voir si on a d'autres paramètres ou des paramètres vides
 Association: 
-	'association' '(' nameClass1=STRING ',' nameClass2=STRING ',' nameLiaison=STRING ',' quantity1=INT ',' quantity2=INT ')' ';'
+	'association' '(' nameClass1=ID ',' nameClass2=ID ',' nameLiaison=ID ',' quantity1=INT ',' quantity2=INT ')' ';'
 ;
 
 StrongAggregation:
-	'strongAssociation' '(' nameClass1=STRING ',' nameClass2=STRING ',' nameLiaison=STRING ',' quantity2=INT ')' ';'
+	'strongAssociation' '(' nameClass1=ID ',' nameClass2=ID ',' nameLiaison=ID ',' quantity2=INT ')' ';'
 ;
 
 
@@ -44,15 +44,16 @@ Object:
 	Class | AbstractClass | Interface | Enum;
 	
 
-// Need to review, think that parameter / function can be optional. 
 
-// TODO :: remove double " for class name
+
+
+// Keep the parameter and the function
 ClassContent: name=ID '{'
 	'parameter' '{'
-		(params+=Parameter)+ 
+		(params+=DefinedParameter)*
 	'}'
 	'function' '{'
-		(functions+=Function)+
+		(functions+=Function)*
 	'}'
 '}'
 ;
@@ -66,13 +67,23 @@ Interface: 'interface' content=ClassContent;
 
 
 
-Parameter: visibility=VISIBILITY modifier=MODIFIER type=TYPE name=ID ';';
-// Think to the keyword static that can be add at the beginning 
 
-FunctionParameter: modifier=MODIFIER type=TYPE name=ID';';
+// Definition of a parameter 
+DefinedParameter: StaticParameter | ClassicParameter;
 
+StaticParameter: visibility=VISIBILITY 'static' modifier=MODIFIER? type=TYPE name=ID ';';
+
+ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';';
+
+
+
+ 
+
+FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
+
+// Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
-	(params+=FunctionParameter)+ 	
+	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
 
@@ -88,7 +99,7 @@ EnumConstante: name=ID ';';
 // PACKAGE
 // TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
 Package: 'package' name=ID '{' 
-	(packageName+=STRING ',')+
+	(packageName+=ID ','?)+
 '}';
 
 
@@ -101,7 +112,7 @@ MODIFIER returns ecore::EString:
 	'final' | 'const';
 
 TYPE returns ecore::EString:
-	'string' | 'int' | 'boolean' | 'long'
+	'string' | 'String' | 'int' | 'boolean' | 'long' | 'void'
 ;
 
 
