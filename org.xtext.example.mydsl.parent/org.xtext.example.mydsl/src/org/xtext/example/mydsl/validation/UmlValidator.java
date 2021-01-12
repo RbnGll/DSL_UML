@@ -3,6 +3,9 @@
  */
 package org.xtext.example.mydsl.validation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.ClassContent;
 import org.xtext.example.mydsl.uml.Relation;
@@ -27,11 +30,19 @@ public class UmlValidator extends AbstractUmlValidator {
 	}
 	
 	@Check
-	public void checkPoisitiveIntOnRelation(Relation r) {
+	public void checkPositiveIntOnRelation(Relation r) {
 		if(r.getQuantity2()<0) {
 			warning("Quantity should be positive", 
 					UmlPackage.Literals.RELATION__QUANTITY2,
 					INVALID_QUANTITY);
+		}
+	}
+	
+	@Check
+	public void checkClass1ExistOnAssociation(Relation r) {
+		List<String> list = new ArrayList<String>(); //List of declared class names
+		if(list.contains(r.getNameClass2())) {
+			warning("Class1 have not been declared", UmlPackage.Literals.CLASS, 1);
 		}
 	}
 	
