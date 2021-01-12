@@ -3,17 +3,24 @@
  */
 package org.xtext.example.mydsl.generator
 
+import com.google.inject.Inject
+import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.xtext.example.mydsl.uml.Class
 import org.xtext.example.mydsl.uml.ClassContent
-import com.google.inject.Inject
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.xtext.example.mydsl.uml.DefinedParameter
-import org.eclipse.emf.common.util.EList
+import org.xtext.example.mydsl.uml.ClassicParameter
 import org.xtext.example.mydsl.uml.Function
+import org.xtext.example.mydsl.uml.StaticParameter
+import org.xtext.example.mydsl.uml.UmlObject
+import org.xtext.example.mydsl.uml.AbstractClass
+import org.xtext.example.mydsl.uml.Interface
+import org.xtext.example.mydsl.uml.Enum
+import org.xtext.example.mydsl.uml.Link
+import org.xtext.example.mydsl.uml.Heritage
 
 /**
  * Generates code from your model files on save.
@@ -22,6 +29,7 @@ import org.xtext.example.mydsl.uml.Function
  */
  
 class UmlGenerator extends AbstractGenerator {
+	var links = newArrayList()
 	
 	@Inject extension IQualifiedNameProvider
 	
@@ -31,49 +39,91 @@ class UmlGenerator extends AbstractGenerator {
 //				.filter(Greeting)
 //				.map[name]
 //				.join(', '))
-		for (e: resource.allContents.toIterable.filter(Class)){
-			fsa.generateFile(e.fullyQualifiedName.toString("/") + ".java", e.compile)
+
+		links.addAll(resource.allContents.toIterable.filter(Link).toList)
+		
+		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
+			fsa.generateFile(umlObject.class.toString + ".java", umlObject.compile())
+			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
 		}
+		
+		
 	}
+	def processUmlObject(UmlObject object) {
+			return ""
+	}
+	
+	
+	
 		
-	private def compile(Class c) '''
-		«IF c.eContainer.fullyQualifiedName !== null»
-			package «c.eContainer.fullyQualifiedName»;
-		«ENDIF»
+	/**
+	 * Call the right compilation method
+	 */
+	private dispatch def compile(UmlObject umlObject)''' Error while compiling «umlObject»
+	'''
 		
-		public class «c.content.name» {
+	private dispatch def compile(Class c) '''
+		public class «processUmlObject(c)» {
 			«IF c.content !== null »
 			«c.content.compile»
 			«ENDIF»
 		}
 	'''
-	private def compile (ClassContent cc) '''
+	
+	// TODO
+	private dispatch def compile (AbstractClass aClass)'''«aClass»
+	'''
+	
+	// TODO
+	private dispatch def compile (Interface umlInterface)'''«umlInterface»
+	'''
+	// TODO
+	private dispatch def compile (Enum umlEnum)'''«umlEnum»
+	'''
+	//TODO
+	private def compile(ClassContent cc) '''
 		«IF cc.params !== null && !cc.params.empty»
-			« cc.params.compile»
+			params
 		«ENDIF»
 		
 		«IF cc.functions !== null && !cc.functions.empty»
-		«cc.functions.compile»
+			functions
 		«ENDIF»
 	'''
 	
-	
-	// TODO
-	private def compile (EList<?> p) '''
-		«IF p !== null && p.class.toString === 'EList<DefinedParameter>'»
-			«IF !p.empty»
-				/*TODO*/
+	/**
+	 * Here, the given list can either contain parameters or functions
+	 * Therefore, it's type must be tested in order to process it accordingly
+	 *
+	private def compile(EList<?> list) '''
+		«IF list !== null && list.class.toString === 'EList<DefinedParameter>'»
+			«IF !list.empty»
+				«FOR param : list»
+					«IF param instanceof StaticParameter»
+						«param.visibility» static «param.modifier» «param.type» «param.name»
+					«ELSEIF param instanceof ClassicParameter»
+						«param.visibility» static «param.modifier» «param.type» «param.name»
+					«ENDIF»
+				«ENDFOR»
 			«ENDIF»
 		«ENDIF»
 		
-		«IF p !== null && p.class.toString === 'EList<Function>'»
-			«IF !p.empty»
-				/*TODO*/
+		«IF list !== null && list.class.toString === 'EList<Function>'»
+			«IF !list.empty»
+				«FOR function : list»
+					«IF function instanceof Function»
+						«function.compile»
+					«ENDIF»
+				«ENDFOR»
 			«ENDIF»
 		«ENDIF»
 	'''
 	
-	
-	
-		
+	private dispatch def compile (Function function) '''
+		«function.visibility» «function.name»(«FOR param : function.params»«param.visibility» «param.modifier» «param.type» «param.name»,«ENDFOR»){ 
+			
+		}
+	'''
+	* 
+	*/
 }

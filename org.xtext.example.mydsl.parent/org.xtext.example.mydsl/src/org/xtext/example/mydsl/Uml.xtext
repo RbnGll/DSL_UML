@@ -8,7 +8,7 @@ Program:
 	(code+=Statement)*;
 
 Statement:
-	Link | Object | Package;
+	Link | UmlObject | Package;
 	
 	
 // LINKS
@@ -21,11 +21,11 @@ Relation:
 
 	
 Implementation: 
-	'implementation' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
+	'implementation' '(' motherClass=ID ',' childrenClass=ID ')' ';'
 ;
 	
 Heritage:
-	'heritage' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
+	'heritage' '(' superClass=ID ',' childrenClass=ID ')' ';'
 ;
 
 
@@ -40,7 +40,7 @@ StrongAggregation:
 
 
 // OBJECTS
-Object: 
+UmlObject: 
 	Class | AbstractClass | Interface | Enum;
 	
 
