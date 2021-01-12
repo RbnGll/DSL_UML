@@ -38,5 +38,25 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		});
 	}
 	
+	@Fix(UmlValidator.NO_CLASS_CONTENT)
+	public void generateClassContent(final Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Generate class content", "Generate attributes and functions container", "", new IModification() {
+			public void apply(IModificationContext context) throws BadLocationException {
+				IXtextDocument xtextDocument= context.getXtextDocument();
+				String toAdd = "parameter {"
+						+ "}"
+						+ "function {"
+						+ "}";
+				try {
+					xtextDocument.replace(issue.getOffset(), toAdd.length(), toAdd);
+				} catch (org.eclipse.jface.text.BadLocationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+		});
+	}
+	
 
 }

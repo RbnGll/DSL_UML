@@ -3,17 +3,15 @@
  */
 package org.xtext.example.mydsl.generator
 
+import com.google.inject.Inject
+import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.xtext.example.mydsl.uml.Class
 import org.xtext.example.mydsl.uml.ClassContent
-import com.google.inject.Inject
-import org.eclipse.xtext.naming.IQualifiedNameProvider
-import org.xtext.example.mydsl.uml.DefinedParameter
-import org.eclipse.emf.common.util.EList
-import org.xtext.example.mydsl.uml.Function
 
 /**
  * Generates code from your model files on save.
