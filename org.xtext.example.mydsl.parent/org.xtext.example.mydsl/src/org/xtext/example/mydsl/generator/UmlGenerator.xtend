@@ -21,6 +21,7 @@ import org.xtext.example.mydsl.uml.Interface
 import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.Heritage
+import org.xtext.example.mydsl.uml.DefinedParameter
 
 /**
  * Generates code from your model files on save.
@@ -49,9 +50,7 @@ class UmlGenerator extends AbstractGenerator {
 		
 		
 	}
-	def processUmlObject(UmlObject object) {
-			return ""
-	}
+	private dispatch def processUmlObject(UmlObject object)'''«object»'''
 	
 	
 	
@@ -63,19 +62,23 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 		
 	private dispatch def compile(Class c) '''
-		public class «processUmlObject(c)» {
+		class «processUmlObject(c)» {
 			«IF c.content !== null »
-			«c.content.compile»
+				«c.content.compile»
 			«ENDIF»
 		}
 	'''
 	
 	// TODO
-	private dispatch def compile (AbstractClass aClass)'''«aClass»
+	private dispatch def compile (AbstractClass aClass)'''
+		abstract «IF aClass.class_ !== null »
+					«aClass.class_.compile»
+		         «ENDIF»
 	'''
 	
 	// TODO
-	private dispatch def compile (Interface umlInterface)'''«umlInterface»
+	private dispatch def compile (Interface umlInterface)'''
+		interface «umlInterface»
 	'''
 	// TODO
 	private dispatch def compile (Enum umlEnum)'''«umlEnum»
@@ -83,47 +86,54 @@ class UmlGenerator extends AbstractGenerator {
 	//TODO
 	private def compile(ClassContent cc) '''
 		«IF cc.params !== null && !cc.params.empty»
-			params
+			«cc.params.compile»
 		«ENDIF»
 		
 		«IF cc.functions !== null && !cc.functions.empty»
-			functions
+			«cc.functions.compile»
 		«ENDIF»
 	'''
 	
 	/**
-	 * Here, the given list can either contain parameters or functions
-	 * Therefore, it's type must be tested in order to process it accordingly
-	 *
+	 * All ELists<T> should be compiled here, because of Java erasure
+	 * Basically, the Java compiler deletes the generic type contained in the list for overridden methods.
+	 * As CharSequence.compile() is overridden several times, the generic type is erased, resulting in multiple methods with the same signature
+	 * 
+	 * Retrieving the generic type contained in a list is a very annoying task to perform, 
+	 * we therefore used a workaround by assuming that each EList should only contain a single type
+	 * we can then test the class type of the first element of that list 
+	 */
+	 
 	private def compile(EList<?> list) '''
-		«IF list !== null && list.class.toString === 'EList<DefinedParameter>'»
-			«IF !list.empty»
-				«FOR param : list»
-					«IF param instanceof StaticParameter»
-						«param.visibility» static «param.modifier» «param.type» «param.name»
-					«ELSEIF param instanceof ClassicParameter»
-						«param.visibility» static «param.modifier» «param.type» «param.name»
-					«ENDIF»
-				«ENDFOR»
-			«ENDIF»
+	««« H
+		«IF list !== null && !list.empty && list.get(0) instanceof DefinedParameter»
+			«FOR param : list as EList<DefinedParameter>»
+				«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier != null»«param.modifier» «ENDIF»«param.type» «param.name»;
+			«ENDFOR»
 		«ENDIF»
-		
-		«IF list !== null && list.class.toString === 'EList<Function>'»
-			«IF !list.empty»
-				«FOR function : list»
-					«IF function instanceof Function»
-						«function.compile»
-					«ENDIF»
-				«ENDFOR»
-			«ENDIF»
+	
+		«IF list !== null && !list.empty && list.get(0) instanceof Function»
+			«FOR function : list as EList<Function>»
+				«IF function instanceof Function»«function.compile»«ENDIF»
+			«ENDFOR»
 		«ENDIF»
 	'''
 	
-	private dispatch def compile (Function function) '''
-		«function.visibility» «function.name»(«FOR param : function.params»«param.visibility» «param.modifier» «param.type» «param.name»,«ENDFOR»){ 
-			
-		}
+	/*
+	private dispatch def compile (EList<DefinedParameter> parameters)'''
+		«IF !parameters.empty»
+			«FOR param : parameters»
+				«param.visibility.compile» «IF param instanceof StaticParameter» static «ENDIF»«IF param.modifier != null» «param.modifier» «ENDIF»«param.type» «param.name»
+			«ENDFOR»
+		«ENDIF»
 	'''
 	* 
 	*/
+	
+	
+	private dispatch def compile (Function function) '''
+		«IF function.visibility == '#'»protected«ELSEIF function.visibility == '-'»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params != null»«FOR param : function.params»«param.visibility» «param.modifier» «param.type» «param.name»,«ENDFOR»«ENDIF») { 
+			// TODO - Auto generated method
+		}
+	'''
 }

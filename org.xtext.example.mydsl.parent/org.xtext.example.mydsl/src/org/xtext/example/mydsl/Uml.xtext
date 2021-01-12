@@ -3,6 +3,13 @@ grammar org.xtext.example.mydsl.Uml with org.eclipse.xtext.common.Terminals
 generate uml "http://www.xtext.org/example/mydsl/Uml"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
+// TODO
+/*
+ * Add modifiers management on umlObjects
+ * Change interface bcz it cannot have parameters
+ * Add modifier static to functions
+ */
+
 
 Program:
 	(code+=Statement)*;
