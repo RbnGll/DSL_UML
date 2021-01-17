@@ -14,15 +14,13 @@ import org.xtext.example.mydsl.uml.ClassContent
 import org.xtext.example.mydsl.uml.DefinedParameter
 import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Function
-import org.xtext.example.mydsl.uml.FunctionParameter
 import org.xtext.example.mydsl.uml.Heritage
+import org.xtext.example.mydsl.uml.Implementation
 import org.xtext.example.mydsl.uml.Interface
+import org.xtext.example.mydsl.uml.InterfaceFunction
 import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
-import org.xtext.example.mydsl.uml.Implementation
-import org.xtext.example.mydsl.uml.InterfaceFunction
-import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -44,7 +42,7 @@ class UmlGenerator extends AbstractGenerator {
 		
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
 			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
-			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).class_.content.name+ ".java", umlObject.compile());
+			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
 			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
 			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
 		}
@@ -58,7 +56,7 @@ class UmlGenerator extends AbstractGenerator {
 		val umlExtends = links.filter(Heritage).toList
 		for (link: umlExtends){
 			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
-				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).class_.content.name) ||
+				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
 				isExtend = true
@@ -75,9 +73,8 @@ class UmlGenerator extends AbstractGenerator {
 		var numberImplemented = 0;
 		val umlImplements = links.filter(Implementation).toList
 		for (link: umlImplements){
-			System.out.println(link)
 			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
-				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).class_.content.name) ||
+				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
 				isImplements = true
@@ -95,7 +92,6 @@ class UmlGenerator extends AbstractGenerator {
 		res += processExtends(umlObject)
 		if(!res.isEmpty) res+=" "
 		res += processImplements(umlObject)
-		System.out.println(res)
 		return res;
 	}
 		
@@ -115,8 +111,12 @@ class UmlGenerator extends AbstractGenerator {
 	
 	// TODO
 	private dispatch def compile (AbstractClass aClass)'''
-		abstract «aClass.compile»
+		abstract class «aClass.name» «processUmlObject(aClass)»{
+			«aClass.params.compile»
+			«aClass.functions.compile»
+		}
 	'''
+	
 	
 	// TODO
 	private dispatch def compile (Interface umlInterface)'''
@@ -170,7 +170,6 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 	
 	private dispatch def compile (Function function) '''
-		«function»
 		«IF function.visibility == '#'»protected
 		«ELSEIF function.visibility == '-'»private
 		«ELSE»public«ENDIF» «function.returnType» «function.name»() { 
@@ -178,8 +177,7 @@ class UmlGenerator extends AbstractGenerator {
 		}
 	'''
 	private dispatch def compile (InterfaceFunction function) '''
-		«function»
-		«IF function.visibility.toString === '#'.toString»
+		«IF function.visibility.toString == '#'.toString»
 			protected
 		«ELSEIF function.visibility == '-'»
 			private
