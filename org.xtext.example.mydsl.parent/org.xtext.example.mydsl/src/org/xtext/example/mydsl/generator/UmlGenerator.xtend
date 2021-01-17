@@ -22,6 +22,7 @@ import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
 import org.xtext.example.mydsl.uml.Implementation
 import org.xtext.example.mydsl.uml.InterfaceFunction
+import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -56,39 +57,46 @@ class UmlGenerator extends AbstractGenerator {
 		var isExtend = false
 		val umlExtends = links.filter(Heritage).toList
 		for (link: umlExtends){
-			if(link.childrenClass === (umlObject as Class).content.name ||
-				link.childrenClass === (umlObject as AbstractClass).class_.content.name ||
-				link.childrenClass === (umlObject as Interface).name
-			)
-			isExtend = true
-			res += link.superClass
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).class_.content.name) ||
+				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
+			){
+				isExtend = true
+				res += link.superClass
+			}
+		
 		}
 		return isExtend ? res : ""
 	}
 	
 	def String processImplements(UmlObject umlObject){
-		var res = "implements"
+		var res = "implements "
 		var isImplements = false
 		var numberImplemented = 0;
 		val umlImplements = links.filter(Implementation).toList
 		for (link: umlImplements){
-			if(link.childrenClass === (umlObject as Class).content.name ||
-				link.childrenClass === (umlObject as AbstractClass).class_.content.name ||
-				link.childrenClass === (umlObject as Interface).name
-			)
-			isImplements = true
-			numberImplemented++
-			res += link.motherClass
-			if(numberImplemented>1) res+=", "
+			System.out.println(link)
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).class_.content.name) ||
+				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
+			){
+				isImplements = true
+				numberImplemented++
+				res += link.motherClass
+				if(numberImplemented>0) res+=", "
+			}
 		}
-		if (numberImplemented>1) res = res.chars.limit(res.length - 2).toString // Delete the last useless blank space and comma
+		if (numberImplemented>1) res = res.substring(0, res.length-2)// Delete the last useless blank space and comma
 		return isImplements ? res : "" 
 	}
 	
 	def String processUmlObject(UmlObject umlObject){
 		var res = "";
-		res += processExtends(umlObject)+" "
+		res += processExtends(umlObject)
+		if(!res.isEmpty) res+=" "
 		res += processImplements(umlObject)
+		System.out.println(res)
+		return res;
 	}
 		
 	/**
@@ -162,15 +170,21 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 	
 	private dispatch def compile (Function function) '''
+		«function»
 		«IF function.visibility == '#'»protected
 		«ELSEIF function.visibility == '-'»private
-		«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params !== null»«FOR param : function.params»«param.visibility» «(param as FunctionParameter).modifier» «param.type» «param.name»,«ENDFOR»«ENDIF») { 
+		«ELSE»public«ENDIF» «function.returnType» «function.name»() { 
 			// TODO - Auto generated method
 		}
 	'''
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility == '#'»protected
-		«ELSEIF function.visibility == '-'»private
-		«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params !== null»«FOR param : function.params»«param.visibility» «(param as FunctionParameter).modifier» «param.type» «param.name»,«ENDFOR»«ENDIF»);
+		«function»
+		«IF function.visibility.toString === '#'.toString»
+			protected
+		«ELSEIF function.visibility == '-'»
+			private
+		«ELSE»
+			public«ENDIF» «function.returnType» «function.name»();
+		
 	'''
 }
