@@ -3,18 +3,11 @@
  */
 package org.xtext.example.mydsl.ui.outline;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.inject.Inject;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.ui.PluginImageHelper;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
-import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode;
-
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.Enum;
 import org.xtext.example.mydsl.uml.Interface;

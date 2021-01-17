@@ -70,7 +70,12 @@ Class: 'class' content=ClassContent;
 AbstractClass: 'abstract' class=Class;
 
 // https://www.uml-diagrams.org/class-reference.html
-Interface: 'interface' content=ClassContent;
+Interface: 'interface' name=ID '{'
+	'function' '{'
+		(functions+=InterfaceFunction)
+	'}'
+'}'
+;
 
 
 
@@ -90,6 +95,10 @@ FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
 
 // Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+	(params+=FunctionParameter ','?)* 	
+')' ';';
+
+InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 

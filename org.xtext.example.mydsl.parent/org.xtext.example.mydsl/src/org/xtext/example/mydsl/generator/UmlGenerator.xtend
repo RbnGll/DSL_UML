@@ -3,25 +3,25 @@
  */
 package org.xtext.example.mydsl.generator
 
-import com.google.inject.Inject
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.xtext.example.mydsl.uml.AbstractClass
 import org.xtext.example.mydsl.uml.Class
 import org.xtext.example.mydsl.uml.ClassContent
-import org.xtext.example.mydsl.uml.ClassicParameter
+import org.xtext.example.mydsl.uml.DefinedParameter
+import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Function
+import org.xtext.example.mydsl.uml.FunctionParameter
+import org.xtext.example.mydsl.uml.Heritage
+import org.xtext.example.mydsl.uml.Interface
+import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
-import org.xtext.example.mydsl.uml.AbstractClass
-import org.xtext.example.mydsl.uml.Interface
-import org.xtext.example.mydsl.uml.Enum
-import org.xtext.example.mydsl.uml.Link
-import org.xtext.example.mydsl.uml.Heritage
-import org.xtext.example.mydsl.uml.DefinedParameter
+import org.xtext.example.mydsl.uml.Implementation
+import org.xtext.example.mydsl.uml.InterfaceFunction
 
 /**
  * Generates code from your model files on save.
@@ -31,9 +31,7 @@ import org.xtext.example.mydsl.uml.DefinedParameter
  
 class UmlGenerator extends AbstractGenerator {
 	var links = newArrayList()
-	
-	@Inject extension IQualifiedNameProvider
-	
+		
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 //		fsa.generateFile('greetings.txt', 'People to greet: ' + 
 //			resource.allContents
@@ -44,16 +42,54 @@ class UmlGenerator extends AbstractGenerator {
 		links.addAll(resource.allContents.toIterable.filter(Link).toList)
 		
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
-			fsa.generateFile(umlObject.class.toString + ".java", umlObject.compile())
+			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
+			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).class_.content.name+ ".java", umlObject.compile());
+			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
 			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
 		}
 		
 		
 	}
-	private dispatch def processUmlObject(UmlObject object)'''«object»'''
 	
+	def String processExtends(UmlObject umlObject){
+		var res = "extends "
+		var isExtend = false
+		val umlExtends = links.filter(Heritage).toList
+		for (link: umlExtends){
+			if(link.childrenClass === (umlObject as Class).content.name ||
+				link.childrenClass === (umlObject as AbstractClass).class_.content.name ||
+				link.childrenClass === (umlObject as Interface).name
+			)
+			isExtend = true
+			res += link.superClass
+		}
+		return isExtend ? res : ""
+	}
 	
+	def String processImplements(UmlObject umlObject){
+		var res = "implements"
+		var isImplements = false
+		var numberImplemented = 0;
+		val umlImplements = links.filter(Implementation).toList
+		for (link: umlImplements){
+			if(link.childrenClass === (umlObject as Class).content.name ||
+				link.childrenClass === (umlObject as AbstractClass).class_.content.name ||
+				link.childrenClass === (umlObject as Interface).name
+			)
+			isImplements = true
+			numberImplemented++
+			res += link.motherClass
+			if(numberImplemented>1) res+=", "
+		}
+		if (numberImplemented>1) res = res.chars.limit(res.length - 2).toString // Delete the last useless blank space and comma
+		return isImplements ? res : "" 
+	}
 	
+	def String processUmlObject(UmlObject umlObject){
+		var res = "";
+		res += processExtends(umlObject)+" "
+		res += processImplements(umlObject)
+	}
 		
 	/**
 	 * Call the right compilation method
@@ -62,7 +98,7 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 		
 	private dispatch def compile(Class c) '''
-		class «processUmlObject(c)» {
+		class «c.content.name» «processUmlObject(c)»{
 			«IF c.content !== null »
 				«c.content.compile»
 			«ENDIF»
@@ -71,20 +107,20 @@ class UmlGenerator extends AbstractGenerator {
 	
 	// TODO
 	private dispatch def compile (AbstractClass aClass)'''
-		abstract «IF aClass.class_ !== null »
-					«aClass.class_.compile»
-		         «ENDIF»
+		abstract «aClass.compile»
 	'''
 	
 	// TODO
 	private dispatch def compile (Interface umlInterface)'''
-		interface «umlInterface»
+		interface «umlInterface.name»{
+			«umlInterface.functions.compile»
+		}
 	'''
 	// TODO
 	private dispatch def compile (Enum umlEnum)'''«umlEnum»
 	'''
 	//TODO
-	private def compile(ClassContent cc) '''
+	private dispatch def compile(ClassContent cc) '''
 		«IF cc.params !== null && !cc.params.empty»
 			«cc.params.compile»
 		«ENDIF»
@@ -104,36 +140,37 @@ class UmlGenerator extends AbstractGenerator {
 	 * we can then test the class type of the first element of that list 
 	 */
 	 
-	private def compile(EList<?> list) '''
+	private dispatch def compile(EList<?> list) '''
 	««« H
 		«IF list !== null && !list.empty && list.get(0) instanceof DefinedParameter»
 			«FOR param : list as EList<DefinedParameter>»
-				«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier != null»«param.modifier» «ENDIF»«param.type» «param.name»;
+				«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
 			«ENDFOR»
 		«ENDIF»
-	
+		«IF list !== null && !list.empty && list.get(0) instanceof InterfaceFunction»
+			«FOR function : list as EList<InterfaceFunction>»
+					«IF function instanceof InterfaceFunction»
+					«function.compile»
+					«ENDIF»
+			«ENDFOR»
+		«ENDIF»
 		«IF list !== null && !list.empty && list.get(0) instanceof Function»
-			«FOR function : list as EList<Function>»
-				«IF function instanceof Function»«function.compile»«ENDIF»
-			«ENDFOR»
+		«FOR function : list as EList<Function>»
+		«function.compile»
+		«ENDFOR»
 		«ENDIF»
 	'''
-	
-	/*
-	private dispatch def compile (EList<DefinedParameter> parameters)'''
-		«IF !parameters.empty»
-			«FOR param : parameters»
-				«param.visibility.compile» «IF param instanceof StaticParameter» static «ENDIF»«IF param.modifier != null» «param.modifier» «ENDIF»«param.type» «param.name»
-			«ENDFOR»
-		«ENDIF»
-	'''
-	* 
-	*/
-	
 	
 	private dispatch def compile (Function function) '''
-		«IF function.visibility == '#'»protected«ELSEIF function.visibility == '-'»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params != null»«FOR param : function.params»«param.visibility» «param.modifier» «param.type» «param.name»,«ENDFOR»«ENDIF») { 
+		«IF function.visibility == '#'»protected
+		«ELSEIF function.visibility == '-'»private
+		«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params !== null»«FOR param : function.params»«param.visibility» «(param as FunctionParameter).modifier» «param.type» «param.name»,«ENDFOR»«ENDIF») { 
 			// TODO - Auto generated method
 		}
+	'''
+	private dispatch def compile (InterfaceFunction function) '''
+		«IF function.visibility == '#'»protected
+		«ELSEIF function.visibility == '-'»private
+		«ELSE»public«ENDIF» «function.returnType» «function.name»(«IF function.params !== null»«FOR param : function.params»«param.visibility» «(param as FunctionParameter).modifier» «param.type» «param.name»,«ENDFOR»«ENDIF»);
 	'''
 }
