@@ -21,6 +21,7 @@ import org.xtext.example.mydsl.uml.InterfaceFunction
 import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
+import org.xtext.example.mydsl.uml.AbstractFunction
 
 /**
  * Generates code from your model files on save.
@@ -95,12 +96,6 @@ class UmlGenerator extends AbstractGenerator {
 		return res;
 	}
 		
-	/**
-	 * Call the right compilation method
-	 */
-	private dispatch def compile(UmlObject umlObject)''' Error while compiling «umlObject»
-	'''
-		
 	private dispatch def compile(Class c) '''
 		class «c.content.name» «processUmlObject(c)»{
 			«IF c.content !== null »
@@ -126,6 +121,7 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 	// TODO
 	private dispatch def compile (Enum umlEnum)'''«umlEnum»
+	
 	'''
 	//TODO
 	private dispatch def compile(ClassContent cc) '''
@@ -147,25 +143,31 @@ class UmlGenerator extends AbstractGenerator {
 	 * we therefore used a workaround by assuming that each EList should only contain a single type
 	 * we can then test the class type of the first element of that list 
 	 */
-	 
 	private dispatch def compile(EList<?> list) '''
 	««« H
-		«IF list !== null && !list.empty && list.get(0) instanceof DefinedParameter»
-			«FOR param : list as EList<DefinedParameter>»
-				«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
-			«ENDFOR»
-		«ENDIF»
-		«IF list !== null && !list.empty && list.get(0) instanceof InterfaceFunction»
-			«FOR function : list as EList<InterfaceFunction>»
-					«IF function instanceof InterfaceFunction»
+		«IF !list.empty»
+			«IF !list.empty && list.get(0) instanceof DefinedParameter»
+				«FOR param : list as EList<DefinedParameter>»
+					«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
+				«ENDFOR»
+			«ENDIF»
+			«IF !list.empty && list.get(0) instanceof InterfaceFunction»
+				«FOR function : list as EList<InterfaceFunction>»
+						«IF function instanceof InterfaceFunction»
+						«function.compile»
+						«ENDIF»
+				«ENDFOR»
+			«ENDIF»
+			«IF !list.empty && list.get(0) instanceof Function»
+				«FOR function : list as EList<Function>»
+				«function.compile»
+				«ENDFOR»
+			«ENDIF»
+			«IF list.get(0) instanceof AbstractFunction»
+				«FOR function : list as EList<AbstractFunction>»
 					«function.compile»
-					«ENDIF»
-			«ENDFOR»
-		«ENDIF»
-		«IF list !== null && !list.empty && list.get(0) instanceof Function»
-		«FOR function : list as EList<Function>»
-		«function.compile»
-		«ENDFOR»
+				«ENDFOR»
+			«ENDIF»
 		«ENDIF»
 	'''
 	
@@ -183,6 +185,13 @@ class UmlGenerator extends AbstractGenerator {
 			private
 		«ELSE»
 			public«ENDIF» «function.returnType» «function.name»();
-		
 	'''
+	private dispatch def compile (AbstractFunction function)'''
+		«IF function.visibility.toString == '#'.toString»
+			protected
+		«ELSEIF function.visibility == '-'»
+			private
+		«ELSE»
+			public«ENDIF» abstract «function.returnType» «function.name»();
+	''' 
 }

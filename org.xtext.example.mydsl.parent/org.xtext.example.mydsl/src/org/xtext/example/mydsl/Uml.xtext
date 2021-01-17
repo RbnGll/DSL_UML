@@ -71,10 +71,11 @@ AbstractClass: 'abstract' 'class' name=ID '{'
 		(params+=DefinedParameter)*
 	'}'
 	'function' '{'
-		(functions+=Function)*
+		(functions+=AbstractFunction)*
 	'}'
 '}'
 ;
+
 
 // https://www.uml-diagrams.org/class-reference.html
 Interface: 'interface' name=ID '{'
@@ -104,6 +105,11 @@ FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
+
+AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=TYPE name=ID'(' 
+	(params+=FunctionParameter ','?)* 	
+')' ';'
+;
 
 InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
