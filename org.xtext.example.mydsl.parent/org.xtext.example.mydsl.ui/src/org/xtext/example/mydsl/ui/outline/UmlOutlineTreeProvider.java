@@ -5,39 +5,26 @@ package org.xtext.example.mydsl.ui.outline;
 
 import javax.inject.Inject;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.osgi.container.ModuleContainer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-<<<<<<< HEAD
-=======
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.xtext.AbstractElement;
-import org.eclipse.xtext.ui.IImageHelper;
->>>>>>> master
 import org.eclipse.xtext.ui.PluginImageHelper;
-import org.eclipse.xtext.ui.editor.outline.IOutlineNode;
-import org.eclipse.xtext.ui.editor.outline.impl.AbstractOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
-<<<<<<< HEAD
-=======
 import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode;
-import org.eclipse.xtext.ui.editor.outline.impl.EObjectNode;
 import org.eclipse.xtext.ui.editor.utils.TextStyle;
 import org.eclipse.xtext.ui.label.StylerFactory;
->>>>>>> master
+import org.xtext.example.mydsl.uml.AbstractClass;
+import org.xtext.example.mydsl.uml.Association;
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.DefinedParameter;
 import org.xtext.example.mydsl.uml.Enum;
+import org.xtext.example.mydsl.uml.Heritage;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Program;
 import org.xtext.example.mydsl.uml.Statement;
-import org.xtext.example.mydsl.uml.Heritage;
-import org.xtext.example.mydsl.uml.AbstractClass;
-import org.xtext.example.mydsl.uml.Association;
+import org.xtext.example.mydsl.uml.UmlObject;
 
 
 
@@ -101,6 +88,7 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	 * - Italics
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private TextStyle abstractClassStyle() {
 		TextStyle textStyle = new TextStyle();
 		textStyle.setStyle(SWT.ITALIC);
@@ -131,7 +119,7 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
     
     	for (Statement s : progra.getCode()) {
     		
-    		if (s instanceof org.xtext.example.mydsl.uml.Object) {
+    		if (s instanceof UmlObject) {
     			
     			if (!objectNodeCreated) {
 //    				createNode(parentNode, s);
@@ -150,9 +138,9 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
     			if (s instanceof Class) {
     				createChildren(parentNode, ((Class) s).getContent());
     			} else if (s instanceof AbstractClass) {
-    				createChildren(parentNode, ((AbstractClass) s).getClass_().getContent());
+    			//	createChildren(parentNode, ((AbstractClass) s).getContent());
     			} else if (s instanceof Interface) {
-    				createChildren(parentNode, ((Interface) s).getContent());
+    			//	createChildren(parentNode, ((Interface) s).getContent());
     			} else if (s instanceof Enum) {
     				createChildren(parentNode, ((Enum) s));
     			} else {
