@@ -45,18 +45,18 @@ public class UmlValidator extends AbstractUmlValidator {
 	}
 	
 	@Check
-	public void checkClass1ExistOnAssociation(Link r) {
+	public void checkClass1ExistInRelation(Relation r) {
 		List<String> list = new ArrayList<String>(); //List of declared class names
 		if(list.contains(r.getNameClass1())) {
-			warning("Class "+ r.getNameClass1() + " have not been declared", UmlPackage.Literals.LINK__NAME_CLASS1, UNDECLARED_CLASS);
+			warning("Class "+ r.getNameClass1() + " have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
 		}
 	}
 	
 	@Check
-	public void checkClass2ExistOnAssociation(Link r) {
+	public void checkClass2ExistInRelation(Relation r) {
 		List<String> list = new ArrayList<String>(); //List of declared class names
 		if(list.contains(r.getNameClass2())) {
-			warning("Class "+ r.getNameClass2() + " have not been declared", UmlPackage.Literals.LINK__NAME_CLASS2, UNDECLARED_CLASS);
+			warning("Class "+ r.getNameClass2() + " have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 
 		}
 	}
