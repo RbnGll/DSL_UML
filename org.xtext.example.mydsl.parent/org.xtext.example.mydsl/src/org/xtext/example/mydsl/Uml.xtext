@@ -54,17 +54,16 @@ UmlObject:
 
 
 // Keep the parameter and the function
-ClassContent: name=ID '{'
-	'parameter' '{'
-		(params+=DefinedParameter)*
-	'}'
-	'function' '{'
-		(functions+=Function)*
-	'}'
-'}'
-;
+Class: 'class' name=ID '{'
+    'parameter' '{'
+        (params+=DefinedParameter)*
+    '}'
+    'function' '{'
+        (functions+=Function)*
+    '}'
+'}';
 
-Class: 'class' content=ClassContent;
+
 
 AbstractClass: 'abstract' 'class' name=ID '{'
 	'parameter' '{'
