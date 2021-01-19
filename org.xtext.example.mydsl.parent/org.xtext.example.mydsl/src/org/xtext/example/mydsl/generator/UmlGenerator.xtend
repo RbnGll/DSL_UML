@@ -24,6 +24,7 @@ import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
 import org.xtext.example.mydsl.uml.AbstractFunction
 >>>>>>> master
+import org.xtext.example.mydsl.uml.AbstractFunction
 
 /**
  * Generates code from your model files on save.
