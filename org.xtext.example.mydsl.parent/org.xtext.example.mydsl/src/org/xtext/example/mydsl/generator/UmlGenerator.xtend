@@ -23,7 +23,7 @@ import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
 import org.xtext.example.mydsl.uml.AbstractFunction
->>>>>>> master
+
 
 /**
  * Generates code from your model files on save.
