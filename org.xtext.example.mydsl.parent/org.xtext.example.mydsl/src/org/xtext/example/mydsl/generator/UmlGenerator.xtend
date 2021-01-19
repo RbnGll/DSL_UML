@@ -45,6 +45,7 @@ class UmlGenerator extends AbstractGenerator {
 			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
 			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
 			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
+			if(umlObject instanceof Enum) fsa.generateFile((umlObject as Enum).name+".java", umlObject.compile);
 			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
 		}
 		
@@ -95,6 +96,14 @@ class UmlGenerator extends AbstractGenerator {
 		res += processImplements(umlObject)
 		return res;
 	}
+	/**
+	 * For every *.java file created, if the Class, or AbstractClass implements an interface, 
+	 * It returns the signature of methods that must be defined 
+	 */
+	def String defineInterfaceMethods(UmlObject umlObject){
+		if(! (umlObject instanceof Class))
+		return ""
+	}
 		
 	private dispatch def compile(Class c) '''
 		class «c.content.name» «processUmlObject(c)»{
@@ -104,7 +113,6 @@ class UmlGenerator extends AbstractGenerator {
 		}
 	'''
 	
-	// TODO
 	private dispatch def compile (AbstractClass aClass)'''
 		abstract class «aClass.name» «processUmlObject(aClass)»{
 			«aClass.params.compile»
@@ -113,17 +121,19 @@ class UmlGenerator extends AbstractGenerator {
 	'''
 	
 	
-	// TODO
 	private dispatch def compile (Interface umlInterface)'''
 		interface «umlInterface.name»{
 			«umlInterface.functions.compile»
 		}
 	'''
-	// TODO
-	private dispatch def compile (Enum umlEnum)'''«umlEnum»
 	
+	private dispatch def compile (Enum umlEnum)'''
+		enum «umlEnum.name» {
+			«FOR umlEnumConstant: umlEnum.params»
+				«umlEnumConstant.name», 
+			«ENDFOR»
+		}
 	'''
-	//TODO
 	private dispatch def compile(ClassContent cc) '''
 		«IF cc.params !== null && !cc.params.empty»
 			«cc.params.compile»
