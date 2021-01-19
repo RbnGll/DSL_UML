@@ -3,12 +3,18 @@ grammar org.xtext.example.mydsl.Uml with org.eclipse.xtext.common.Terminals
 generate uml "http://www.xtext.org/example/mydsl/Uml"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
+// TODO
+/*
+ * Add modifiers management on umlObjects
+ * Add modifier static to functions
+ */
+
 
 Program:
 	(code+=Statement)*;
 
 Statement:
-	Link | Object | Package;
+	Link | UmlObject | Package;
 	
 	
 // LINKS
@@ -21,11 +27,11 @@ Relation:
 
 	
 Implementation: 
-	'implementation' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
+	'implementation' '(' motherClass=ID ',' childrenClass=ID ')' ';'
 ;
 	
 Heritage:
-	'heritage' '(' nameClass1=ID ',' nameClass2=ID ')' ';'
+	'heritage' '(' superClass=ID ',' childrenClass=ID ')' ';'
 ;
 
 
@@ -40,7 +46,7 @@ StrongAggregation:
 
 
 // OBJECTS
-Object: 
+UmlObject: 
 	Class | AbstractClass | Interface | Enum;
 	
 
@@ -60,10 +66,24 @@ ClassContent: name=ID '{'
 
 Class: 'class' content=ClassContent;
 
-AbstractClass: 'abstract' class=Class;
+AbstractClass: 'abstract' 'class' name=ID '{'
+	'parameter' '{'
+		(params+=DefinedParameter)*
+	'}'
+	'function' '{'
+		(functions+=AbstractFunction)*
+	'}'
+'}'
+;
+
 
 // https://www.uml-diagrams.org/class-reference.html
-Interface: 'interface' content=ClassContent;
+Interface: 'interface' name=ID '{'
+	'function' '{'
+		(functions+=InterfaceFunction)
+	'}'
+'}'
+;
 
 
 
@@ -83,6 +103,15 @@ FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
 
 // Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+	(params+=FunctionParameter ','?)* 	
+')' ';';
+
+AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=TYPE name=ID'(' 
+	(params+=FunctionParameter ','?)* 	
+')' ';'
+;
+
+InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 

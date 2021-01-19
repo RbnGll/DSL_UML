@@ -6,6 +6,7 @@ package org.xtext.example.mydsl.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.Association;
 import org.xtext.example.mydsl.uml.ClassContent;
@@ -56,6 +57,7 @@ public class UmlValidator extends AbstractUmlValidator {
 		List<String> list = new ArrayList<String>(); //List of declared class names
 		if(list.contains(r.getNameClass2())) {
 			warning("Class "+ r.getNameClass2() + " have not been declared", UmlPackage.Literals.LINK__NAME_CLASS2, UNDECLARED_CLASS);
+
 		}
 	}
 	

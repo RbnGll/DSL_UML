@@ -12,6 +12,8 @@ import org.junit.jupiter.api.^extension.ExtendWith
 class UmlCompilationTest {
 	@Inject extension CompilationTestHelper
 	
+	
+	
 	@Test 
 	def ClassTest(){
 		'''public class NomClass {
