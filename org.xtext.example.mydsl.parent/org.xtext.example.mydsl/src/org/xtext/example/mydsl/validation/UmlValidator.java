@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.ClassContent;
+import org.xtext.example.mydsl.uml.AbstractClass;
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlPackage;
@@ -34,12 +35,12 @@ public class UmlValidator extends AbstractUmlValidator {
 	}
 	
 	@Check
-	public void checkPositiveIntOnRelation(Relation r) {
-		if(r.getQuantity2()<0) {
-			warning("Quantity should be positive", 
-					UmlPackage.Literals.RELATION__QUANTITY2,
-					INVALID_QUANTITY);
-		}
+	public void checkAbstractClassNameStartsWithCapital(AbstractClass c) {
+	    if (!Character.isUpperCase(c.getName().charAt(0))) {
+	        warning("Name should start with a capital",
+	            UmlPackage.Literals.ABSTRACT_CLASS__NAME, // TODO :: Change value
+	            INVALID_NAME);
+	    }
 	}
 	
 	@Check
