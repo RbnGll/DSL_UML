@@ -20,6 +20,8 @@ import org.xtext.example.mydsl.uml.Association;
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.DefinedParameter;
 import org.xtext.example.mydsl.uml.Enum;
+import org.xtext.example.mydsl.uml.Function;
+import org.xtext.example.mydsl.uml.FunctionParameter;
 import org.xtext.example.mydsl.uml.Heritage;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.Link;
@@ -36,141 +38,215 @@ import org.xtext.example.mydsl.uml.UmlObject;
  */
 public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
-//	protected void _createChildren(DocumentRootNode parentNode, 
-//			Class c) {
-//		for (AbstractElement element : c.getElements()) {
-//			createNode(parentNode, element);
-//		}
-//	}
+
+	@Inject 
+	private StylerFactory stylerFactory;
 
 	public Object _text(Link l) {
 		return "Link";
 	}
-	
+
 	public Object _text(Class c) {
-		return "Class";
+		return c.getName();
 	}
 
 	public Object _text(Enum c) {
-		return "Enum";
+		return c.getName();
+	}
+
+	public Object _text(AbstractClass c) {
+		TextStyle abstractStyle = abstractClassStyle();
+		return new StyledString(c.getName(), stylerFactory.createXtextStyleAdapterStyler(abstractStyle));
 	}
 
 	public Object _text(Interface c) {
-		return "Interface";
+		TextStyle interfaceStyle = interfaceStyle();
+		return new StyledString(c.getName(), stylerFactory.createXtextStyleAdapterStyler(interfaceStyle));
 	}
+
+
+	public Object _text(DefinedParameter d) {
+
+		TextStyle textStyle = this.setColorFromVisibility(d.getVisibility());
+		//		  textStyle.setStyle(SWT.ITALIC);
+		return new StyledString(d.getName(), stylerFactory.createXtextStyleAdapterStyler(textStyle));
+	}
+	
+	public Object _text(Function function) {
+
+		TextStyle textStyle = this.setColorFromVisibility(function.getVisibility());
+		//		  textStyle.setStyle(SWT.ITALIC);
+		
+		String paramsType = "";
+		String sep = "";
+		for (FunctionParameter e : function.getParams()) {
+			paramsType += sep + e.getType();
+			sep = ", ";
+		}
+		
+		String nameDisplay = function.getName() + "(" + paramsType + ") : " + function.getReturnType();
+		
+		return new StyledString(nameDisplay, stylerFactory.createXtextStyleAdapterStyler(textStyle));
+	}
+
+	/**
+	 * Don't show the list of parameters for the function
+	 * @param Function
+	 * @return
+	 */
+    protected boolean _isLeaf(Function modelElement) {
+        return true;
+    }
+
+	/**
+	 * Set color from visibility char set.
+	 * @param c
+	 * @return TextStyle with the color
+	 */
+	private TextStyle setColorFromVisibility(Character c) {
+
+		TextStyle textStyle = new TextStyle();
+
+		// Set color based on the access
+		switch (c) {
+		case '+':
+			// #00ff7f 
+			textStyle.setColor(new RGB(0, 255, 127));
+			break;
+		case '-':
+			// #ec4646
+			textStyle.setColor(new RGB(236, 70, 70));
+			break;
+		case '#':
+			// #487e95
+			textStyle.setColor(new RGB(72, 126, 149));
+			break;
+		case '~':
+			// No color
+			break;
+		default:
+			break;
+		}
+
+		return textStyle;
+	}
+
+
+
+
+
+	// Links
 
 	public Object _text(Heritage c) {
 		return "Heritage";
 	}
-	
+
 	public Object _text(Association c) {
 		return "Association";
 	}
 
-	@Inject 
-	private StylerFactory stylerFactory;
-	
-	public Object _text(DefinedParameter d) {
-		
-		  TextStyle textStyle = new TextStyle();
-		  textStyle.setColor(new RGB(149, 125, 71));
-		  textStyle.setStyle(SWT.ITALIC);
-		
-		return new StyledString(d.getName(), stylerFactory.createXtextStyleAdapterStyler(textStyle));
-		
-//		return "Parameter : " + d.getName();
-	}
-	
-	
-	
-	
+
+
+
+
+
+
+
 	/**
 	 * Abstract class UML :
 	 * - Italics
 	 * @return
 	 */
-	@SuppressWarnings("unused")
 	private TextStyle abstractClassStyle() {
 		TextStyle textStyle = new TextStyle();
 		textStyle.setStyle(SWT.ITALIC);
 		return textStyle;
 	}
 
-	
-//    protected void _createChildren(DocumentRootNode rootNode, Class fragment) {
-//		createNode(rootNode, fragment.getContent().getParams().get(0));
-////		for (elem : fragment.elements) {
-////			createNode(rootNode, elem)
-////		}
-//	}
-	
-	
-//	public static DocumentRootNode classroot = null;
+	/**
+	 * Interface 
+	 * @return
+	 */
+	private TextStyle interfaceStyle() {
+		TextStyle textStyle = new TextStyle();
+		textStyle.setStyle(SWT.BORDER);
+		return textStyle;
+	}
+
+	//    protected void _createChildren(DocumentRootNode rootNode, Class fragment) {
+	//		createNode(rootNode, fragment.getContent().getParams().get(0));
+	////		for (elem : fragment.elements) {
+	////			createNode(rootNode, elem)
+	////		}
+	//	}
+
+
+	//	public static DocumentRootNode classroot = null;
 
 	private static boolean objectNodeCreated = false;
-	
-    protected void _createChildren(DocumentRootNode parentNode, Program progra) {
-    	
-    	
-//    	Create a new element that will be the parent of the objects, links and packages.
-//    	EObject modelElement = new org.xtext.example.mydsl.uml.Object();
-//		createEObjectNode(parentNode, modelElement );
-    	
+	//	
+	//    protected void _createChildren(DocumentRootNode parentNode, Program progra) {
+	//    	
+	//    	
+	////    	Create a new element that will be the parent of the objects, links and packages.
+	////    	EObject modelElement = new org.xtext.example.mydsl.uml.Object();
+	////		createEObjectNode(parentNode, modelElement );
+	//    	
+	//
+	//    
+	//    	for (Statement s : progra.getCode()) {
+	//    		
+	//    		if (s instanceof UmlObject) {
+	//    			
+	//    			if (!objectNodeCreated) {
+	////    				createNode(parentNode, s);
+	//    				objectNodeCreated = true;
+	//    			}
+	//    			
+	//    			System.out.println("Ok we got one object :" + s.getClass().getName());
+	////    			createChildren(parentNode, s);
+	//    	
+	//    			
+	//    			
+	//    			
+	//    			// TODO :: Group all this in a single node Object 
+	//    			
+	//    			//	Class | AbstractClass | Interface | Enum
+	//    			if (s instanceof Class) {
+	//    				createChildren(parentNode, ((Class) s).getContent());
+	//    			} else if (s instanceof AbstractClass) {
+	//    			//	createChildren(parentNode, ((AbstractClass) s).getContent());
+	//    			} else if (s instanceof Interface) {
+	//    			//	createChildren(parentNode, ((Interface) s).getContent());
+	//    			} else if (s instanceof Enum) {
+	//    				createChildren(parentNode, ((Enum) s));
+	//    			} else {
+	//    				createChildren(parentNode, s);
+	//    			}
+	//    			
+	//    		}
+	//
+	//    		else if (s instanceof org.xtext.example.mydsl.uml.Link) {
+	//    			createChildren(parentNode, s);
+	//    		}
+	//    		
+	//
+	//    		else if (s instanceof org.xtext.example.mydsl.uml.Package) {
+	//    			createChildren(parentNode, s);
+	//    		}
+	//    		else {
+	//    			createChildren(parentNode, s);
+	//    		}
+	//    	}
+	//    	
+	//    
+	//	
+	//    }
 
-    
-    	for (Statement s : progra.getCode()) {
-    		
-    		if (s instanceof UmlObject) {
-    			
-    			if (!objectNodeCreated) {
-//    				createNode(parentNode, s);
-    				objectNodeCreated = true;
-    			}
-    			
-    			System.out.println("Ok we got one object :" + s.getClass().getName());
-//    			createChildren(parentNode, s);
-    	
-    			
-    			
-    			
-    			// TODO :: Group all this in a single node Object 
-    			
-    			//	Class | AbstractClass | Interface | Enum
-    			if (s instanceof Class) {
-    				createChildren(parentNode, ((Class) s).getContent());
-    			} else if (s instanceof AbstractClass) {
-    			//	createChildren(parentNode, ((AbstractClass) s).getContent());
-    			} else if (s instanceof Interface) {
-    			//	createChildren(parentNode, ((Interface) s).getContent());
-    			} else if (s instanceof Enum) {
-    				createChildren(parentNode, ((Enum) s));
-    			} else {
-    				createChildren(parentNode, s);
-    			}
-    			
-    		}
 
-    		else if (s instanceof org.xtext.example.mydsl.uml.Link) {
-    			createChildren(parentNode, s);
-    		}
-    		
-
-    		else if (s instanceof org.xtext.example.mydsl.uml.Package) {
-    			createChildren(parentNode, s);
-    		}
-    		else {
-    			createChildren(parentNode, s);
-    		}
-    	}
-    	
-    
-	
-    }
-	
-	
 	@Inject
 	private PluginImageHelper imageHelper;
-	
+
 	/**
 	 * TODO :: Problem reading image 
 	 * 
@@ -181,6 +257,6 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		return imageHelper.getImageDescriptor("icons/metadata.png");
 	}
 
-	
-	
+
+
 }

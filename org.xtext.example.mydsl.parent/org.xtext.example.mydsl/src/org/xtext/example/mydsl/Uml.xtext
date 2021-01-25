@@ -54,17 +54,16 @@ UmlObject:
 
 
 // Keep the parameter and the function
-ClassContent: name=ID '{'
-	'parameter' '{'
-		(params+=DefinedParameter)*
-	'}'
-	'function' '{'
-		(functions+=Function)*
-	'}'
-'}'
-;
+Class: 'class' name=ID '{'
+    'parameter' '{'
+        (params+=DefinedParameter)*
+    '}'
+    'function' '{'
+        (functions+=Function)*
+    '}'
+'}';
 
-Class: 'class' content=ClassContent;
+
 
 AbstractClass: 'abstract' 'class' name=ID '{'
 	'parameter' '{'
@@ -98,9 +97,11 @@ ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';'
 
 
  
-
+// TODO :: Pour te type, penser que l'on peut avoir une class et pas seulement que des type primitif
 FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
 
+
+// TODO :: Peut-être merger les différentes function en une seul ? 
 // Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	

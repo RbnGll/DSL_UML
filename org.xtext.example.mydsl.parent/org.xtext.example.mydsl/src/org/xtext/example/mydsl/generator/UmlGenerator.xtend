@@ -11,7 +11,6 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.uml.AbstractClass
 import org.xtext.example.mydsl.uml.Class
-import org.xtext.example.mydsl.uml.ClassContent
 import org.xtext.example.mydsl.uml.DefinedParameter
 import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Function
@@ -43,7 +42,7 @@ class UmlGenerator extends AbstractGenerator {
 		links.addAll(resource.allContents.toIterable.filter(Link).toList)
 		
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
-			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
+			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).name + ".java", umlObject.compile());
 			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
 			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
 			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
@@ -57,7 +56,7 @@ class UmlGenerator extends AbstractGenerator {
 		var isExtend = false
 		val umlExtends = links.filter(Heritage).toList
 		for (link: umlExtends){
-			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).name) ||
 				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
@@ -75,7 +74,7 @@ class UmlGenerator extends AbstractGenerator {
 		var numberImplemented = 0;
 		val umlImplements = links.filter(Implementation).toList
 		for (link: umlImplements){
-			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).name) ||
 				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
@@ -98,9 +97,13 @@ class UmlGenerator extends AbstractGenerator {
 	}
 		
 	private dispatch def compile(Class c) '''
-		class «c.content.name» «processUmlObject(c)»{
-			«IF c.content !== null »
-				«c.content.compile»
+		class «c.name» «processUmlObject(c)»{
+			«IF c.params !== null && !c.params.empty»
+				«c.params.compile»
+			«ENDIF»
+					
+			«IF c.functions !== null && !c.functions.empty»
+				«c.functions.compile»
 			«ENDIF»
 		}
 	'''
@@ -123,16 +126,6 @@ class UmlGenerator extends AbstractGenerator {
 	// TODO
 	private dispatch def compile (Enum umlEnum)'''«umlEnum»
 	
-	'''
-	//TODO
-	private dispatch def compile(ClassContent cc) '''
-		«IF cc.params !== null && !cc.params.empty»
-			«cc.params.compile»
-		«ENDIF»
-		
-		«IF cc.functions !== null && !cc.functions.empty»
-			«cc.functions.compile»
-		«ENDIF»
 	'''
 	
 	/**

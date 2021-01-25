@@ -8,6 +8,9 @@ import java.util.List;
 
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.ClassContent;
+import org.xtext.example.mydsl.uml.Class;
+import org.xtext.example.mydsl.uml.Association;
+import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
@@ -24,10 +27,10 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	
 	@Check
-	public void checkClassNameStartsWithCapital(ClassContent c) {
+	public void checkClassNameStartsWithCapital(Class c) {
 	    if (!Character.isUpperCase(c.getName().charAt(0))) {
 	        warning("Name should start with a capital",
-	            UmlPackage.Literals.CLASS_CONTENT__NAME,
+	            UmlPackage.Literals.CLASS_CONTENT__NAME, // TODO :: Change value
 	            INVALID_NAME);
 	    }
 	}
@@ -57,4 +60,12 @@ public class UmlValidator extends AbstractUmlValidator {
 
 		}
 	}
+	
+	@Check
+	public void checkClassHasContent(Class c) {
+		if(c == null) { // TODO :: Voir comment on peut indiquer si parameter et function sont pas déclarés (voir sinon si on laisse class vide ?)
+			error("Classs should had content", UmlPackage.Literals.CLASS__CONTENT, NO_CLASS_CONTENT);
+		}
+	}
+
 }
