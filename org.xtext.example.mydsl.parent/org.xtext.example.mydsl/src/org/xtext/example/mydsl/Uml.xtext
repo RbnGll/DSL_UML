@@ -79,7 +79,7 @@ AbstractClass: 'abstract' 'class' name=ID '{'
 // https://www.uml-diagrams.org/class-reference.html
 Interface: 'interface' name=ID '{'
 	'function' '{'
-		(functions+=InterfaceFunction)
+		(functions+=InterfaceFunction)*
 	'}'
 '}'
 ;
