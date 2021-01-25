@@ -59,7 +59,7 @@ Class: 'class' name=ID '{'
         (params+=DefinedParameter)*
     '}'
     'function' '{'
-        (functions+=Function)*
+        (functions+=ClassicFunction)*
     '}'
 '}';
 
@@ -96,6 +96,9 @@ ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';'
 
 
 
+Function: 
+	ClassicFunction | AbstractFunction | InterfaceFunction
+;
  
 // TODO :: Pour le type, penser que l'on peut avoir une class et pas seulement que des type primitif
 FunctionParameter: modifier=MODIFIER? type=TYPE name=ID;
@@ -103,7 +106,7 @@ FunctionParameter: modifier=MODIFIER? type=TYPE name=ID;
 
 // TODO :: Peut-être merger les différentes function en une seul ? 
 // Here * --> 0 or more
-Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+ClassicFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
@@ -118,11 +121,11 @@ InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'('
 
 
 Enum: 'enum' name=ID '{' 
-	(params+=EnumConstante)+	
+	(params+=EnumConstant)+	
 '}';
 
 
-EnumConstante: name=ID ';';
+EnumConstant: name=ID ';';
 
 
 

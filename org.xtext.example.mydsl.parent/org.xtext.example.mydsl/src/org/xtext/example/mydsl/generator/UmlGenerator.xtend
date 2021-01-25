@@ -10,7 +10,9 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.uml.AbstractClass
+import org.xtext.example.mydsl.uml.AbstractFunction
 import org.xtext.example.mydsl.uml.Class
+import org.xtext.example.mydsl.uml.DefinedParameter
 import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Function
 import org.xtext.example.mydsl.uml.Heritage
@@ -18,16 +20,16 @@ import org.xtext.example.mydsl.uml.Implementation
 import org.xtext.example.mydsl.uml.Interface
 import org.xtext.example.mydsl.uml.InterfaceFunction
 import org.xtext.example.mydsl.uml.Link
-import org.xtext.example.mydsl.uml.UmlObject
-import org.xtext.example.mydsl.uml.AbstractFunction
-import org.xtext.example.mydsl.uml.DefinedParameter
 import org.xtext.example.mydsl.uml.StaticParameter
+import org.xtext.example.mydsl.uml.UmlObject
 
 // TODO
 /*
  * - Implement the interface method implementation
  * - Add the constructor workflow
- * - Add 
+ * - Add the constructed types as function parameter
+ * - Class modifier
+ * - Packages
  */
 
 /**
@@ -41,16 +43,16 @@ class UmlGenerator extends AbstractGenerator {
 	var interfaces = newArrayList() // This list is super useful to implement super interface methods, otherwise we must use reflection
 		
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-
+		
+		// After each save, clear the previously stored links and interfaces
 		links.clear();
 		interfaces.clear();
-
+		
+		// Then save all the links and interfaces to their respective collection for later purpose 
 		links.addAll(resource.allContents.toIterable.filter(Link).toList)
 		interfaces.addAll(resource.allContents.toIterable.filter(Interface).toList)
 		
-		System.out.println("Links :"+links)
-		System.out.println("Interfaces :"+interfaces)
-		
+		// For every java object, create a corresponding file and generate it's inner code with the compile method
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
 			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).name + ".java", umlObject.compile());
 			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
@@ -60,7 +62,11 @@ class UmlGenerator extends AbstractGenerator {
 		
 		
 	}
-	
+	/**
+	 * A method called every time a umlObject is generated
+	 * It searchs if there's an explicit superclass in the stored links and return the corresponding heritage tag
+	 * i.e : "extends superClass"
+	 */
 	def String processExtendLinks(UmlObject umlObject){
 		var res = "extends "
 		var isExtend = false
@@ -78,6 +84,11 @@ class UmlGenerator extends AbstractGenerator {
 		return isExtend ? res : ""
 	}
 	
+	/**
+	 * A method called every time a umlObject is generated
+	 * It searchs if there's any explicit superInterface in the stored links and return the corresponding implementation tag
+	 * i.e : "implements Interface1, Interface2, ..."
+	 */
 	def String processImplementLinks(UmlObject umlObject){
 		var res = "implements "
 		var isImplements = false
@@ -96,7 +107,11 @@ class UmlGenerator extends AbstractGenerator {
 		if (numberImplemented>1) res = res.substring(0, res.length-2)// Delete the last useless blank space and comma
 		return isImplements ? res : "" 
 	}
-	
+	/**
+	 * A method called every time a umlObject is generated
+	 * It returns the corresponding link tag
+	 * i.e : "extends superClass implements Interface1"
+	 */
 	def String processUmlObject(UmlObject umlObject){
 		var res = "";
 		res += processExtendLinks(umlObject)
@@ -118,7 +133,9 @@ class UmlGenerator extends AbstractGenerator {
 			.head
 		return res
 	}
-	
+	/**
+	 * For every function, it returns a string containing all the parameters 
+	 */
 	def compileFunctionParameters(Function function){
 		var res = ""
 		for(param: function.params){
@@ -127,8 +144,10 @@ class UmlGenerator extends AbstractGenerator {
 			}
 			res+=param.type + " "+param.name+", "
 		}
-		return res.substring(0, res.length - 2);
+		if (res.length > 2) return res.substring(0, res.length - 2)
+		return res
 	}
+	
 	/**
 	 * Generate the skeleton of a given class and compiles it's content
 	 */
@@ -180,7 +199,7 @@ class UmlGenerator extends AbstractGenerator {
 	private dispatch def compile (Enum umlEnum)'''
 		enum «umlEnum.name» {
 			«FOR umlEnumConstant: umlEnum.params»
-				«umlEnumConstant.name», 
+				«umlEnumConstant.name»,
 			«ENDFOR»
 		}
 	'''
@@ -195,32 +214,29 @@ class UmlGenerator extends AbstractGenerator {
 	 * we can then test the class type of the first element of that list 
 	 */
 	private dispatch def compile(EList<?> list) '''
-	««« H
 		«IF !list.empty»
-			«IF !list.empty && list.get(0) instanceof DefinedParameter»
+			«IF list.get(0) instanceof DefinedParameter»
 				«FOR param : list as EList<DefinedParameter>»
 					«IF param.visibility.charValue == new Character('#')»protected«ELSEIF param.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
 				«ENDFOR»
-			«ENDIF»
-			«IF !list.empty && list.get(0) instanceof InterfaceFunction»
+			«ELSEIF list.get(0) instanceof InterfaceFunction»
 				«FOR function : list as EList<InterfaceFunction>»
-						«IF function instanceof InterfaceFunction»
+					«IF function instanceof InterfaceFunction»
 						«function.compile»
-						«ENDIF»
+					«ENDIF»
 				«ENDFOR»
-			«ENDIF»
-			«IF !list.empty && list.get(0) instanceof Function»
+			«ELSEIF list.get(0) instanceof Function»
 				«FOR function : list as EList<Function>»
 				«function.compile»
 				«ENDFOR»
-			«ENDIF»
-			«IF list.get(0) instanceof AbstractFunction»
+			«ELSEIF list.get(0) instanceof AbstractFunction»
 				«FOR function : list as EList<AbstractFunction>»
 					«function.compile»
 				«ENDFOR»
 			«ENDIF»
 		«ENDIF»
 	'''
+					
 	/**
 	 * Generate the code for a given Function
 	 */
@@ -233,12 +249,12 @@ class UmlGenerator extends AbstractGenerator {
 	 * Generate the code for a given interface function
 	 */
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF»«function.returnType» «function.name»();
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF»«function.returnType» «function.name»(«compileFunctionParameters(function)»);
 	'''
 	/**
 	 * Generate the code for a given abstract function
 	 */
 	private dispatch def compile (AbstractFunction function)'''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»();
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»(«compileFunctionParameters(function)»);
 	''' 
 }
