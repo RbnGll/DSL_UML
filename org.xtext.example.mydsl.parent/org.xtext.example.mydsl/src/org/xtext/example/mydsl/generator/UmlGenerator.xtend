@@ -22,6 +22,7 @@ import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
 import org.xtext.example.mydsl.uml.AbstractFunction
+import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -30,29 +31,31 @@ import org.xtext.example.mydsl.uml.AbstractFunction
  */
  
 class UmlGenerator extends AbstractGenerator {
-	var links = newArrayList()
+	var links = newArrayList() 		// This list is used to keep a memory state of all links in order to process them after file generation
+	var interfaces = newArrayList() // This list is super useful to implement super interface methods, otherwise we must use reflection
 		
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+
+		links.clear();
+		interfaces.clear();
 
 		links.addAll(resource.allContents.toIterable.filter(Link).toList)
+		interfaces.addAll(resource.allContents.toIterable.filter(Interface).toList)
+		
+		System.out.println("Links :"+links)
+		System.out.println("Interfaces :"+interfaces)
 		
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
 			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
 			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
 			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
 			if(umlObject instanceof Enum) fsa.generateFile((umlObject as Enum).name+".java", umlObject.compile);
-			// fsa.generateFile(umlObject.fullyQualifiedName.toString("/") + ".java", umlObject.compile())
 		}
 		
 		
 	}
 	
-	def String processExtends(UmlObject umlObject){
+	def String processExtendLinks(UmlObject umlObject){
 		var res = "extends "
 		var isExtend = false
 		val umlExtends = links.filter(Heritage).toList
@@ -69,12 +72,11 @@ class UmlGenerator extends AbstractGenerator {
 		return isExtend ? res : ""
 	}
 	
-	def String processImplements(UmlObject umlObject){
+	def String processImplementLinks(UmlObject umlObject){
 		var res = "implements "
 		var isImplements = false
 		var numberImplemented = 0;
-		val umlImplements = links.filter(Implementation).toList
-		for (link: umlImplements){
+		for (link: links.filter(Implementation).toList){
 			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
 				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
@@ -91,42 +93,78 @@ class UmlGenerator extends AbstractGenerator {
 	
 	def String processUmlObject(UmlObject umlObject){
 		var res = "";
-		res += processExtends(umlObject)
+		res += processExtendLinks(umlObject)
 		if(!res.isEmpty) res+=" "
-		res += processImplements(umlObject)
+		res += processImplementLinks(umlObject)
 		return res;
 	}
 	/**
 	 * For every *.java file created, if the Class, or AbstractClass implements an interface, 
-	 * It returns the signature of methods that must be defined 
+	 * It returns the list of interfaces method that should be implemented
 	 */
-	def String defineInterfaceMethods(UmlObject umlObject){
-		if(! (umlObject instanceof Class))
-		return ""
-	}
+	def List<InterfaceFunction> getMethodsToImplement(UmlObject umlObject){
+		if(!(umlObject instanceof Class || umlObject instanceof AbstractClass)) return emptyList()
 		
+		val res =links.filter(Implementation)
+			.filter[link | link.childrenClass.equals(umlObject.class.toString)]
+			// .map[implementation | interfaces.get(implementation.motherClass)]
+			.map[interface | if (interface instanceof Interface) interface.functions else emptyList()]
+			.head
+		return res
+	}
+	
+	def compileFunctionParameters(Function function){
+		var res = ""
+		for(param: function.params){
+			if (param.modifier !== null){
+				res += param.modifier+" "
+			}
+			res+=param.type + " "+param.name+", "
+		}
+		return res.substring(0, res.length - 2);
+	}
+	/**
+	 * Generate the skeleton of a given class and compiles it's content
+	 */
 	private dispatch def compile(Class c) '''
 		class «c.content.name» «processUmlObject(c)»{
-			«IF c.content !== null »
-				«c.content.compile»
+			«c.content.compile»
+			«val methodsToImplement = getMethodsToImplement(c)»
+			«IF methodsToImplement !== null && !methodsToImplement.empty»
+				«FOR method: methodsToImplement»
+					«method.compile»{}
+				«ENDFOR»
 			«ENDIF»
+			«System.out.println("Class : "+c)»
 		}
 	'''
-	
+	/**
+	 * Generate the code for a given abstract class
+	 */
 	private dispatch def compile (AbstractClass aClass)'''
 		abstract class «aClass.name» «processUmlObject(aClass)»{
 			«aClass.params.compile»
 			«aClass.functions.compile»
+			«val methodsToImplement = getMethodsToImplement(aClass)»
+			«IF methodsToImplement !== null && !methodsToImplement.empty»
+				«FOR method: methodsToImplement»
+					«method.compile»{}
+				«ENDFOR»
+			«ENDIF»
 		}
 	'''
 	
-	
+	/**
+	 * Generate the code for an interface
+	 */
 	private dispatch def compile (Interface umlInterface)'''
 		interface «umlInterface.name»{
 			«umlInterface.functions.compile»
 		}
 	'''
-	
+	/**
+	 * Generate the code for an enum
+	 */
 	private dispatch def compile (Enum umlEnum)'''
 		enum «umlEnum.name» {
 			«FOR umlEnumConstant: umlEnum.params»
@@ -134,6 +172,9 @@ class UmlGenerator extends AbstractGenerator {
 			«ENDFOR»
 		}
 	'''
+	/**
+	 * A submethod of class, used to generate the body of a class
+	 */
 	private dispatch def compile(ClassContent cc) '''
 		«IF cc.params !== null && !cc.params.empty»
 			«cc.params.compile»
@@ -158,7 +199,7 @@ class UmlGenerator extends AbstractGenerator {
 		«IF !list.empty»
 			«IF !list.empty && list.get(0) instanceof DefinedParameter»
 				«FOR param : list as EList<DefinedParameter>»
-					«IF param.visibility == '#'»protected«ELSEIF param.visibility == '-'»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
+					«IF param.visibility.charValue == new Character('#')»protected«ELSEIF param.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
 				«ENDFOR»
 			«ENDIF»
 			«IF !list.empty && list.get(0) instanceof InterfaceFunction»
@@ -180,28 +221,24 @@ class UmlGenerator extends AbstractGenerator {
 			«ENDIF»
 		«ENDIF»
 	'''
-	
+	/**
+	 * Generate the code for a given Function
+	 */
 	private dispatch def compile (Function function) '''
-		«IF function.visibility == '#'»protected
-		«ELSEIF function.visibility == '-'»private
-		«ELSE»public«ENDIF» «function.returnType» «function.name»() { 
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»){ 
 			// TODO - Auto generated method
 		}
 	'''
+	/**
+	 * Generate the code for a given interface function
+	 */
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility.toString == '#'.toString»
-			protected
-		«ELSEIF function.visibility == '-'»
-			private
-		«ELSE»
-			public«ENDIF» «function.returnType» «function.name»();
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF»«function.returnType» «function.name»();
 	'''
+	/**
+	 * Generate the code for a given abstract function
+	 */
 	private dispatch def compile (AbstractFunction function)'''
-		«IF function.visibility.toString == '#'.toString»
-			protected
-		«ELSEIF function.visibility == '-'»
-			private
-		«ELSE»
-			public«ENDIF» abstract «function.returnType» «function.name»();
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»();
 	''' 
 }

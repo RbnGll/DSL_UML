@@ -99,7 +99,7 @@ ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';'
 
  
 
-FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
+FunctionParameter: modifier=MODIFIER? type=TYPE name=ID;
 
 // Here * --> 0 or more
 Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
