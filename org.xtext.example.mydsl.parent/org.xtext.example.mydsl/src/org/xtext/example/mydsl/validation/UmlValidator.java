@@ -6,11 +6,9 @@ package org.xtext.example.mydsl.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtext.validation.Check;
+import org.xtext.example.mydsl.uml.ClassContent;
 import org.xtext.example.mydsl.uml.Class;
-import org.xtext.example.mydsl.uml.Association;
-import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
@@ -27,7 +25,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	
 	@Check
-	public void checkClassNameStartsWithCapital(Class c) {
+	public void checkClassNameStartsWithCapital(ClassContent c) {
 	    if (!Character.isUpperCase(c.getName().charAt(0))) {
 	        warning("Name should start with a capital",
 	            UmlPackage.Literals.CLASS_CONTENT__NAME, // TODO :: Change value
@@ -48,7 +46,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	public void checkClass1ExistInRelation(Relation r) {
 		List<String> list = new ArrayList<String>(); //List of declared class names
 		if(list.contains(r.getNameClass1())) {
-			warning("Class "+ r.getNameClass1() + " have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
+			warning("Class '"+ r.getNameClass1() + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
 		}
 	}
 	
@@ -56,11 +54,10 @@ public class UmlValidator extends AbstractUmlValidator {
 	public void checkClass2ExistInRelation(Relation r) {
 		List<String> list = new ArrayList<String>(); //List of declared class names
 		if(list.contains(r.getNameClass2())) {
-			warning("Class "+ r.getNameClass2() + " have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
+			warning("Class '"+ r.getNameClass2() + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 
 		}
 	}
-	
 	
 	@Check
 	public void checkClassHasContent(Class c) {
@@ -68,4 +65,5 @@ public class UmlValidator extends AbstractUmlValidator {
 			error("Classs should had content", UmlPackage.Literals.CLASS__CONTENT, NO_CLASS_CONTENT);
 		}
 	}
+
 }

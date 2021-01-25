@@ -5,6 +5,7 @@ package org.xtext.example.mydsl.ui.quickfix;
 
 import javax.swing.text.BadLocationException;
 
+import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.ui.editor.model.IXtextDocument;
 import org.eclipse.xtext.ui.editor.model.edit.IModification;
 import org.eclipse.xtext.ui.editor.model.edit.IModificationContext;
@@ -38,25 +39,47 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		});
 	}
 	
-	@Fix(UmlValidator.NO_CLASS_CONTENT)
+	@Fix(Diagnostic.SYNTAX_DIAGNOSTIC)
 	public void generateClassContent(final Issue issue, IssueResolutionAcceptor acceptor) {
-		acceptor.accept(issue, "Generate class content", "Generate attributes and functions container", "", new IModification() {
+		String toAdd, title, description;
+		System.out.println(issue.getMessage());
+		if(issue.getMessage().contains("mismatched input '}' expecting 'parameter'")) {
+			toAdd =	""
+					+ "parameter {\n"
+					+ "}\n"
+					+ "function {\n"
+					+ "}"
+					+ "";
+			title = "Generate class content";
+			description = "Generate attributes and functions container";
+		}else if (issue.getMessage().equals("mismatched input '}' expecting 'function'")) {
+			toAdd="function {\n"
+					+ "}"
+					+ "";
+			title = "Generate function container";
+			description = "Generate missing functions container";
+		}else if (issue.getMessage().contains("expecting '}'")) {
+			toAdd="}";
+			title = "Autocomplete";
+			description = "";
+		}
+		else{
+			toAdd = "";
+			title = "No quickfix available for this problem";
+			description = "";
+		}
+		
+		
+		acceptor.accept(issue, title, description, "", new IModification() {
 			public void apply(IModificationContext context) throws BadLocationException {
-				IXtextDocument xtextDocument= context.getXtextDocument();
-				String toAdd = "parameter {"
-						+ "}"
-						+ "function {"
-						+ "}";
 				try {
-					xtextDocument.replace(issue.getOffset(), toAdd.length(), toAdd);
+				IXtextDocument xtextDocument= context.getXtextDocument();
+					xtextDocument.replace(issue.getOffset() - issue.getLength(), 0, toAdd);
 				} catch (org.eclipse.jface.text.BadLocationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-			
 		});
 	}
-	
-
 }
