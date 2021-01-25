@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.xtext.validation.Check;
-import org.xtext.example.mydsl.uml.ClassContent;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.AbstractClass;
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.Relation;
+import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
 /**
@@ -26,29 +26,13 @@ public class UmlValidator extends AbstractUmlValidator {
 	public static final String NO_CLASS_CONTENT = "noClassContent";
 	
 	
-	@Check
-	public void checkClassNameStartsWithCapital(ClassContent c) {
-	    if (!Character.isUpperCase(c.getName().charAt(0))) {
-	        warning("Name should start with a capital",
-	            UmlPackage.Literals.CLASS_CONTENT__NAME, // TODO :: Change value
-	            INVALID_NAME);
-	    }
-	}
+	
 	
 	@Check
-	public void checkAbstractClassNameStartsWithCapital(AbstractClass c) {
-	    if (!Character.isUpperCase(c.getName().charAt(0))) {
+	public void checkInterfaceNameStartsWithCapital(UmlObject o) {
+	    if (!Character.isUpperCase(o.getName().charAt(0))) {
 	        warning("Name should start with a capital",
-	            UmlPackage.Literals.ABSTRACT_CLASS__NAME, // TODO :: Change value
-	            INVALID_NAME);
-	    }
-	}
-	
-	@Check
-	public void checkInterfaceNameStartsWithCapital(Interface i) {
-	    if (!Character.isUpperCase(i.getName().charAt(0))) {
-	        warning("Name should start with a capital",
-	            UmlPackage.Literals.INTERFACE__NAME, // TODO :: Change value
+	            UmlPackage.Literals.UML_OBJECT__NAME, // TODO :: Change value
 	            INVALID_NAME);
 	    }
 	}
@@ -67,13 +51,6 @@ public class UmlValidator extends AbstractUmlValidator {
 		if(list.contains(r.getNameClass2())) {
 			warning("Class '"+ r.getNameClass2() + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 
-		}
-	}
-	
-	@Check
-	public void checkClassHasContent(Class c) {
-		if(c == null) { // TODO :: Voir comment on peut indiquer si parameter et function sont pas déclarés (voir sinon si on laisse class vide ?)
-			error("Classs should had content", UmlPackage.Literals.CLASS__CONTENT, NO_CLASS_CONTENT);
 		}
 	}
 

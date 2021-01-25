@@ -56,13 +56,13 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 			charToChange = 0;
 			offset = issue.getLength();
 		}else if (issue.getMessage().equals("mismatched input '}' expecting 'function'")) {
-			toAdd="function {\n"
+			toAdd="\n function {\n"
 					+ "}"
 					+ "";
 			title = "Generate function container";
 			description = "Generate missing functions container";
 			charToChange = 0;
-			offset = issue.getLength();
+			offset = issue.getLength() -1;
 		}else if (issue.getMessage().contains("expecting '}'")) {
 			toAdd="}";
 			title = "Autocomplete";
