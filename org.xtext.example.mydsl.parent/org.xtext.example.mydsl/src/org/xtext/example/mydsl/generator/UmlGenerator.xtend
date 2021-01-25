@@ -3,6 +3,7 @@
  */
 package org.xtext.example.mydsl.generator
 
+import java.util.List
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
@@ -10,8 +11,6 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.uml.AbstractClass
 import org.xtext.example.mydsl.uml.Class
-import org.xtext.example.mydsl.uml.ClassContent
-import org.xtext.example.mydsl.uml.DefinedParameter
 import org.xtext.example.mydsl.uml.Enum
 import org.xtext.example.mydsl.uml.Function
 import org.xtext.example.mydsl.uml.Heritage
@@ -19,10 +18,17 @@ import org.xtext.example.mydsl.uml.Implementation
 import org.xtext.example.mydsl.uml.Interface
 import org.xtext.example.mydsl.uml.InterfaceFunction
 import org.xtext.example.mydsl.uml.Link
-import org.xtext.example.mydsl.uml.StaticParameter
 import org.xtext.example.mydsl.uml.UmlObject
 import org.xtext.example.mydsl.uml.AbstractFunction
-import java.util.List
+import org.xtext.example.mydsl.uml.DefinedParameter
+import org.xtext.example.mydsl.uml.StaticParameter
+
+// TODO
+/*
+ * - Implement the interface method implementation
+ * - Add the constructor workflow
+ * - Add 
+ */
 
 /**
  * Generates code from your model files on save.
@@ -46,7 +52,7 @@ class UmlGenerator extends AbstractGenerator {
 		System.out.println("Interfaces :"+interfaces)
 		
 		for (umlObject: resource.allContents.toIterable.filter(UmlObject)){
-			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).content.name + ".java", umlObject.compile());
+			if(umlObject instanceof Class) fsa.generateFile((umlObject as Class).name + ".java", umlObject.compile());
 			if(umlObject instanceof AbstractClass) fsa.generateFile((umlObject as AbstractClass).name+ ".java", umlObject.compile());
 			if(umlObject instanceof Interface) fsa.generateFile((umlObject as Interface).name+".java", umlObject.compile);
 			if(umlObject instanceof Enum) fsa.generateFile((umlObject as Enum).name+".java", umlObject.compile);
@@ -60,7 +66,7 @@ class UmlGenerator extends AbstractGenerator {
 		var isExtend = false
 		val umlExtends = links.filter(Heritage).toList
 		for (link: umlExtends){
-			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).name) ||
 				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
@@ -77,7 +83,7 @@ class UmlGenerator extends AbstractGenerator {
 		var isImplements = false
 		var numberImplemented = 0;
 		for (link: links.filter(Implementation).toList){
-			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).content.name) ||
+			if( (umlObject instanceof Class && link.childrenClass == (umlObject as Class).name) ||
 				(umlObject instanceof AbstractClass && link.childrenClass == (umlObject as AbstractClass).name) ||
 				(umlObject instanceof Interface && link.childrenClass == (umlObject as Interface).name)
 			){
@@ -127,15 +133,21 @@ class UmlGenerator extends AbstractGenerator {
 	 * Generate the skeleton of a given class and compiles it's content
 	 */
 	private dispatch def compile(Class c) '''
-		class «c.content.name» «processUmlObject(c)»{
-			«c.content.compile»
+		class «c.name» «processUmlObject(c)»{
 			«val methodsToImplement = getMethodsToImplement(c)»
 			«IF methodsToImplement !== null && !methodsToImplement.empty»
 				«FOR method: methodsToImplement»
 					«method.compile»{}
 				«ENDFOR»
 			«ENDIF»
-			«System.out.println("Class : "+c)»
+			«IF c.params !== null && !c.params.empty»
+				«c.params.compile»
+			«ENDIF»
+					
+			«IF c.functions !== null && !c.functions.empty»
+				«c.functions.compile»
+			«ENDIF»
+			
 		}
 	'''
 	/**
@@ -171,18 +183,6 @@ class UmlGenerator extends AbstractGenerator {
 				«umlEnumConstant.name», 
 			«ENDFOR»
 		}
-	'''
-	/**
-	 * A submethod of class, used to generate the body of a class
-	 */
-	private dispatch def compile(ClassContent cc) '''
-		«IF cc.params !== null && !cc.params.empty»
-			«cc.params.compile»
-		«ENDIF»
-		
-		«IF cc.functions !== null && !cc.functions.empty»
-			«cc.functions.compile»
-		«ENDIF»
 	'''
 	
 	/**

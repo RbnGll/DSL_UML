@@ -144,6 +144,13 @@ class UmlParsingTest {
 	}
 	
 	@Test
+	def void negativeLinktest(){
+		result = parseHelper.parse('''
+		association(NomClass,AutreClass, nomLiaison, -10);
+		''')
+	}
+	
+	@Test
 	def void implementationTest(){
 		result = parseHelper.parse('''
 		implementation(NomClass, ParentClass);
