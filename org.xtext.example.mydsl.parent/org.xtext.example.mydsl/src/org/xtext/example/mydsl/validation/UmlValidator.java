@@ -9,8 +9,6 @@ import java.util.List;
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.ClassContent;
 import org.xtext.example.mydsl.uml.Class;
-import org.xtext.example.mydsl.uml.Association;
-import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
@@ -27,7 +25,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	
 	@Check
-	public void checkClassNameStartsWithCapital(Class c) {
+	public void checkClassNameStartsWithCapital(ClassContent c) {
 	    if (!Character.isUpperCase(c.getName().charAt(0))) {
 	        warning("Name should start with a capital",
 	            UmlPackage.Literals.CLASS_CONTENT__NAME, // TODO :: Change value
