@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.xtext.validation.Check;
-import org.xtext.example.mydsl.uml.Interface;
-import org.xtext.example.mydsl.uml.AbstractClass;
-import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
