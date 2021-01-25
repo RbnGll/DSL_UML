@@ -5,7 +5,7 @@ package org.xtext.example.mydsl.ui.outline;
 
 import javax.inject.Inject;
 
-
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
@@ -16,6 +16,7 @@ import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode;
 import org.eclipse.xtext.ui.editor.utils.TextStyle;
 import org.eclipse.xtext.ui.label.StylerFactory;
 import org.xtext.example.mydsl.uml.AbstractClass;
+import org.xtext.example.mydsl.uml.AbstractFunction;
 import org.xtext.example.mydsl.uml.Association;
 import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.DefinedParameter;
@@ -24,6 +25,7 @@ import org.xtext.example.mydsl.uml.Function;
 import org.xtext.example.mydsl.uml.FunctionParameter;
 import org.xtext.example.mydsl.uml.Heritage;
 import org.xtext.example.mydsl.uml.Interface;
+import org.xtext.example.mydsl.uml.InterfaceFunction;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Program;
 import org.xtext.example.mydsl.uml.Statement;
@@ -72,29 +74,80 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		return new StyledString(d.getName(), stylerFactory.createXtextStyleAdapterStyler(textStyle));
 	}
 	
+	
+	
+	
 	public Object _text(Function function) {
+		return this.getStyleForFunction(function.getName(), function.getVisibility(), function.getParams(), function.getReturnType());
+	}
 
-		TextStyle textStyle = this.setColorFromVisibility(function.getVisibility());
-		//		  textStyle.setStyle(SWT.ITALIC);
-		
+	public Object _text(AbstractFunction function) {
+		return this.getStyleForFunction(function.getName(), function.getVisibility(), function.getParams(), function.getReturnType());
+	}
+	
+	public Object _text(InterfaceFunction function) {
+		return this.getStyleForFunction(function.getName(), function.getVisibility(), function.getParams(), function.getReturnType());
+	}
+
+	
+	/**
+	 * Get the style for the function
+	 * @param name
+	 * @param visibility
+	 * @param params
+	 * @param returnType
+	 * @return
+	 */
+	private Object getStyleForFunction(String name, Character visibility, EList<FunctionParameter> params, String returnType) {
+		TextStyle textStyle = this.setColorFromVisibility(visibility);
+		String nameDisplay = this.getDisplayNameFromFunction(name, params, returnType);
+		return new StyledString(nameDisplay, stylerFactory.createXtextStyleAdapterStyler(textStyle));
+	}
+	
+	
+	/**
+	 * Get the name that we will display in the outline
+	 * @param name Name of the function
+	 * @param params The list of parameters
+	 * @param returnType The name of the return type
+	 * @return String 
+	 */
+	private String getDisplayNameFromFunction(String name, EList<FunctionParameter> params, String returnType) {
 		String paramsType = "";
 		String sep = "";
-		for (FunctionParameter e : function.getParams()) {
+		for (FunctionParameter e : params) {
 			paramsType += sep + e.getType();
 			sep = ", ";
 		}
 		
-		String nameDisplay = function.getName() + "(" + paramsType + ") : " + function.getReturnType();
-		
-		return new StyledString(nameDisplay, stylerFactory.createXtextStyleAdapterStyler(textStyle));
+		return name + "(" + paramsType + ") : " + returnType;
 	}
+	
 
 	/**
-	 * Don't show the list of parameters for the function
+	 * Don't show the list of parameters for the function.
 	 * @param Function
 	 * @return
 	 */
     protected boolean _isLeaf(Function modelElement) {
+        return true;
+    }
+
+    /**
+     * Don't show the list of parameters for the function. 
+     * @param modelElement
+     * @return
+     */
+    protected boolean _isLeaf(AbstractFunction modelElement) {
+        return true;
+    }
+    
+    /**
+     * Don't show the list of parameters for the function.
+     * @param modelElement
+     * @return
+     */
+    protected boolean _isLeaf(InterfaceFunction modelElement) {
         return true;
     }
 
