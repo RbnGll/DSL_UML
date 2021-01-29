@@ -106,7 +106,7 @@ FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=ID name=ID;
 
 // TODO :: Peut-être merger les différentes function en une seul ? 
 // Here * --> 0 or more
-Function: visibility=VISIBILITY returnType=ID name=ID'(' 
+ClassicFunction: visibility=VISIBILITY returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
