@@ -90,29 +90,29 @@ Interface: 'interface' name=ID '{'
 // Definition of a parameter 
 DefinedParameter: StaticParameter | ClassicParameter;
 
-StaticParameter: visibility=VISIBILITY 'static' modifier=MODIFIER? type=TYPE name=ID ';';
+StaticParameter: visibility=VISIBILITY 'static' modifier=MODIFIER? type=ID name=ID ';';
 
-ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';';
+ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=ID name=ID ';';
 
 
 
  
 // TODO :: Pour te type, penser que l'on peut avoir une class et pas seulement que des type primitif
-FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=TYPE name=ID;
+FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=ID name=ID;
 
 
 // TODO :: Peut-être merger les différentes function en une seul ? 
 // Here * --> 0 or more
-Function: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+Function: visibility=VISIBILITY returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
-AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=TYPE name=ID'(' 
+AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';'
 ;
 
-InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+InterfaceFunction: visibility=VISIBILITY returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
@@ -141,9 +141,9 @@ VISIBILITY returns ecore::EChar:
 MODIFIER returns ecore::EString:
 	'final' | 'const';
 
-TYPE returns ecore::EString:
-	'string' | 'String' | 'int' | 'boolean' | 'long' | 'void'
-;
+//TYPE returns ecore::EString:
+//	'string' | 'String' | 'int' | 'boolean' | 'long' | 'void'
+//;
 
 
 	
