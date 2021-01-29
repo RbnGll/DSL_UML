@@ -138,10 +138,10 @@ Package: 'package' name=ID '{'
 
 
 
-VISIBILITY returns ecore::EChar: 
+terminal VISIBILITY returns ecore::EChar: 
 	'+' | '-' | '#' | '~';
 
-MODIFIER returns ecore::EString:
+terminal MODIFIER returns ecore::EString:
 	'final' | 'const';
 
 //TYPE returns ecore::EString:
