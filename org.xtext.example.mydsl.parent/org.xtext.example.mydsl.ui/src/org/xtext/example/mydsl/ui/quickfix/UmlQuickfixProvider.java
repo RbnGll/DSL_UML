@@ -42,6 +42,7 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 	@Fix(Diagnostic.SYNTAX_DIAGNOSTIC)
 	public void generateClassContent(final Issue issue, IssueResolutionAcceptor acceptor) {
 		String toAdd, title, description;
+		int charToChange, offset;
 		System.out.println(issue.getMessage());
 		if(issue.getMessage().contains("mismatched input '}' expecting 'parameter'")) {
 			toAdd =	""
@@ -52,21 +53,35 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 					+ "";
 			title = "Generate class content";
 			description = "Generate attributes and functions container";
+			charToChange = 0;
+			offset = issue.getLength();
 		}else if (issue.getMessage().equals("mismatched input '}' expecting 'function'")) {
-			toAdd="function {\n"
+			toAdd="\n function {\n"
 					+ "}"
 					+ "";
 			title = "Generate function container";
 			description = "Generate missing functions container";
+			charToChange = 0;
+			offset = issue.getLength() -1;
 		}else if (issue.getMessage().contains("expecting '}'")) {
 			toAdd="}";
 			title = "Autocomplete";
 			description = "";
+			charToChange = 0;
+			offset = issue.getLength();
+		}else if (issue.getMessage().equals("extraneous input '-' expecting RULE_INT")) {
+			toAdd="";
+			title = "Use positive number";
+			description="Suppress the '-' character";
+			charToChange = 1;
+			offset = 0;
 		}
 		else{
 			toAdd = "";
 			title = "No quickfix available for this problem";
 			description = "";
+			charToChange = 0;
+			offset = issue.getLength();
 		}
 		
 		
@@ -74,7 +89,7 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 			public void apply(IModificationContext context) throws BadLocationException {
 				try {
 				IXtextDocument xtextDocument= context.getXtextDocument();
-					xtextDocument.replace(issue.getOffset() - issue.getLength(), 0, toAdd);
+					xtextDocument.replace(issue.getOffset() - offset, charToChange, toAdd);
 				} catch (org.eclipse.jface.text.BadLocationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

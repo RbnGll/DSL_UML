@@ -6,10 +6,13 @@ package org.xtext.example.mydsl.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.validation.Check;
-import org.xtext.example.mydsl.uml.ClassContent;
-import org.xtext.example.mydsl.uml.Class;
+import org.xtext.example.mydsl.uml.Heritage;
+import org.xtext.example.mydsl.uml.Implementation;
+import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
+import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
 
 /**
@@ -24,45 +27,56 @@ public class UmlValidator extends AbstractUmlValidator {
 	public static final String NO_CLASS_CONTENT = "noClassContent";
 	
 	
+	
+	
 	@Check
-	public void checkClassNameStartsWithCapital(ClassContent c) {
-	    if (!Character.isUpperCase(c.getName().charAt(0))) {
+	public void checkInterfaceNameStartsWithCapital(UmlObject o) {
+	    if (!Character.isUpperCase(o.getName().charAt(0))) {
 	        warning("Name should start with a capital",
-	            UmlPackage.Literals.CLASS_CONTENT__NAME, // TODO :: Change value
+	            UmlPackage.Literals.UML_OBJECT__NAME, // TODO :: Change value
 	            INVALID_NAME);
 	    }
 	}
 	
 	@Check
-	public void checkPositiveIntOnRelation(Relation r) {
-		if(r.getQuantity2()<0) {
-			warning("Quantity should be positive", 
-					UmlPackage.Literals.RELATION__QUANTITY2,
-					INVALID_QUANTITY);
+	public void checkClass1ExistInLink(Link l) {
+		String className;
+		if (l instanceof Heritage) {
+			className = ((Heritage)l).getChildrenClass();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {//TODO find good if
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.HERITAGE__CHILDREN_CLASS, UNDECLARED_CLASS);
+			}
+		}else if (l instanceof Implementation){
+			className =((Implementation)l).getChildrenClass();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTATION__CHILDREN_CLASS, UNDECLARED_CLASS);
+			}
+		}else if (l instanceof Relation){
+			className =((Relation)l).getNameClass1();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
+			}
 		}
 	}
 	
 	@Check
-	public void checkClass1ExistInRelation(Relation r) {
-		List<String> list = new ArrayList<String>(); //List of declared class names
-		if(list.contains(r.getNameClass1())) {
-			warning("Class '"+ r.getNameClass1() + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
-		}
-	}
-	
-	@Check
-	public void checkClass2ExistInRelation(Relation r) {
-		List<String> list = new ArrayList<String>(); //List of declared class names
-		if(list.contains(r.getNameClass2())) {
-			warning("Class '"+ r.getNameClass2() + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
-
-		}
-	}
-	
-	@Check
-	public void checkClassHasContent(Class c) {
-		if(c == null) { // TODO :: Voir comment on peut indiquer si parameter et function sont pas déclarés (voir sinon si on laisse class vide ?)
-			error("Classs should had content", UmlPackage.Literals.CLASS__CONTENT, NO_CLASS_CONTENT);
+	public void checkClass2ExistInLink(Link l) {
+		String className;
+		if (l instanceof Heritage) {
+			className = ((Heritage)l).getSuperClass();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.HERITAGE__SUPER_CLASS, UNDECLARED_CLASS);
+			}
+		}else if (l instanceof Implementation){
+			className =((Implementation)l).getMotherClass();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTATION__MOTHER_CLASS, UNDECLARED_CLASS);
+			}
+		}else if (l instanceof Relation){
+			className =((Relation)l).getNameClass2();
+			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
+			}
 		}
 	}
 

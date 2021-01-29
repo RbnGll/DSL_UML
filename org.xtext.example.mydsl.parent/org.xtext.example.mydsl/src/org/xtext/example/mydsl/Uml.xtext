@@ -59,7 +59,7 @@ Class: 'class' name=ID '{'
         (params+=DefinedParameter)*
     '}'
     'function' '{'
-        (functions+=Function)*
+        (functions+=ClassicFunction)*
     '}'
 '}';
 
@@ -96,6 +96,9 @@ ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=ID name=ID ';';
 
 
 
+Function: 
+	ClassicFunction | AbstractFunction | InterfaceFunction
+;
  
 // TODO :: Pour te type, penser que l'on peut avoir une class et pas seulement que des type primitif
 FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=ID name=ID;
@@ -118,11 +121,11 @@ InterfaceFunction: visibility=VISIBILITY returnType=ID name=ID'('
 
 
 Enum: 'enum' name=ID '{' 
-	(params+=EnumConstante)+	
+	(params+=EnumConstant)+	
 '}';
 
 
-EnumConstante: name=ID ';';
+EnumConstant: name=ID ';';
 
 
 
