@@ -29,6 +29,7 @@ import org.xtext.example.mydsl.uml.InterfaceFunction;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Program;
 import org.xtext.example.mydsl.uml.Statement;
+import org.xtext.example.mydsl.uml.StaticParameter;
 import org.xtext.example.mydsl.uml.UmlObject;
 
 
@@ -40,10 +41,16 @@ import org.xtext.example.mydsl.uml.UmlObject;
  */
 public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
+	private static final RGB VISIBILITY_COLOR_PUBLIC = new RGB(0, 255, 127);		// #00ff7f 
+	private static final RGB VISIBILITY_COLOR_PRIVATE = new RGB(236, 70, 70);		// #ec4646
+	private static final RGB VISIBILITY_COLOR_PROTECTED = new RGB(72, 126, 149);  	// #487e95
+	
 
 	@Inject 
 	private StylerFactory stylerFactory;
 
+	
+	
 	public Object _text(Link l) {
 		return "Link";
 	}
@@ -67,11 +74,29 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 
 
+	/**
+	 * Defined Parameter style.
+	 * Example: name : String
+	 * 
+	 * @param d DefinedParameter : StaticParameter | ClassicParameter
+	 * 
+	 * @return
+	 */
 	public Object _text(DefinedParameter d) {
 
+		// Get the style for from the visibility
 		TextStyle textStyle = this.setColorFromVisibility(d.getVisibility());
-		//		  textStyle.setStyle(SWT.ITALIC);
-		return new StyledString(d.getName(), stylerFactory.createXtextStyleAdapterStyler(textStyle));
+
+		// Set the name that we want to display
+		String displayName = d.getName() + " : " + d.getType();
+		
+		// Check if the variable is static
+		if (d instanceof StaticParameter) {
+			// Add static style
+			textStyle.setStyle(SWT.ITALIC);
+		}
+		
+		return new StyledString(displayName, stylerFactory.createXtextStyleAdapterStyler(textStyle));
 	}
 	
 	
@@ -163,16 +188,13 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		// Set color based on the access
 		switch (c) {
 		case '+':
-			// #00ff7f 
-			textStyle.setColor(new RGB(0, 255, 127));
+			textStyle.setColor(VISIBILITY_COLOR_PUBLIC);
 			break;
 		case '-':
-			// #ec4646
-			textStyle.setColor(new RGB(236, 70, 70));
+			textStyle.setColor(VISIBILITY_COLOR_PRIVATE);
 			break;
 		case '#':
-			// #487e95
-			textStyle.setColor(new RGB(72, 126, 149));
+			textStyle.setColor(VISIBILITY_COLOR_PROTECTED);
 			break;
 		case '~':
 			// No color
@@ -203,8 +225,6 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
 
 
-
-
 	/**
 	 * Abstract class UML :
 	 * - Italics
@@ -226,82 +246,15 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		return textStyle;
 	}
 
-	//    protected void _createChildren(DocumentRootNode rootNode, Class fragment) {
-	//		createNode(rootNode, fragment.getContent().getParams().get(0));
-	////		for (elem : fragment.elements) {
-	////			createNode(rootNode, elem)
-	////		}
-	//	}
-
-
-	//	public static DocumentRootNode classroot = null;
-
-	private static boolean objectNodeCreated = false;
-	//	
-	//    protected void _createChildren(DocumentRootNode parentNode, Program progra) {
-	//    	
-	//    	
-	////    	Create a new element that will be the parent of the objects, links and packages.
-	////    	EObject modelElement = new org.xtext.example.mydsl.uml.Object();
-	////		createEObjectNode(parentNode, modelElement );
-	//    	
-	//
-	//    
-	//    	for (Statement s : progra.getCode()) {
-	//    		
-	//    		if (s instanceof UmlObject) {
-	//    			
-	//    			if (!objectNodeCreated) {
-	////    				createNode(parentNode, s);
-	//    				objectNodeCreated = true;
-	//    			}
-	//    			
-	//    			System.out.println("Ok we got one object :" + s.getClass().getName());
-	////    			createChildren(parentNode, s);
-	//    	
-	//    			
-	//    			
-	//    			
-	//    			// TODO :: Group all this in a single node Object 
-	//    			
-	//    			//	Class | AbstractClass | Interface | Enum
-	//    			if (s instanceof Class) {
-	//    				createChildren(parentNode, ((Class) s).getContent());
-	//    			} else if (s instanceof AbstractClass) {
-	//    			//	createChildren(parentNode, ((AbstractClass) s).getContent());
-	//    			} else if (s instanceof Interface) {
-	//    			//	createChildren(parentNode, ((Interface) s).getContent());
-	//    			} else if (s instanceof Enum) {
-	//    				createChildren(parentNode, ((Enum) s));
-	//    			} else {
-	//    				createChildren(parentNode, s);
-	//    			}
-	//    			
-	//    		}
-	//
-	//    		else if (s instanceof org.xtext.example.mydsl.uml.Link) {
-	//    			createChildren(parentNode, s);
-	//    		}
-	//    		
-	//
-	//    		else if (s instanceof org.xtext.example.mydsl.uml.Package) {
-	//    			createChildren(parentNode, s);
-	//    		}
-	//    		else {
-	//    			createChildren(parentNode, s);
-	//    		}
-	//    	}
-	//    	
-	//    
-	//	
-	//    }
-
+	
+	
+	
 
 	@Inject
 	private PluginImageHelper imageHelper;
 
 	/**
-	 * TODO :: Problem reading image 
+	 * TODO :: Problem reading image, maybe the source file is not available for eclipse :'(
 	 * 
 	 * @param c
 	 * @return
