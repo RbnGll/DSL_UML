@@ -119,22 +119,47 @@ class UmlGenerator extends AbstractGenerator {
 		res += processImplementLinks(umlObject)
 		return res;
 	}
+	
 	/**
 	 * For every *.java file created, if the Class, or AbstractClass implements an interface, 
 	 * It returns the list of interfaces method that should be implemented
 	 */
-	def List<InterfaceFunction> getMethodsToImplement(UmlObject umlObject){
-		if(!(umlObject instanceof Class || umlObject instanceof AbstractClass)) return emptyList()
+	def String getMethodsToImplement(UmlObject umlObject){
+		if(!(umlObject instanceof Class || umlObject instanceof AbstractClass)) return ""
+		var methods = newArrayList()
+		var res = ""
 		
-		val res =links.filter(Implementation)
-			.filter[link | link.childrenClass.equals(umlObject.class.toString)]
-			// .map[implementation | interfaces.get(implementation.motherClass)]
-			.map[interface | if (interface instanceof Interface) interface.functions else emptyList()]
-			.head
-		return res
+		// First, retrieve the name of the interfaces implemented by the umlObject
+		val superInterfaces = links.filter(Implementation)
+							.filter[implementation | implementation.childrenClass.equals(umlObject.name)]
+							.map[implementation | implementation.motherClass]
+		
+		// Then, for all interface name found, add the interface function to a list					
+		for (String interfaceName : superInterfaces){
+			var mother = interfaces.filter(Interface).filter[interface | interface.name.equals(interfaceName)].head
+			if(mother !== null){
+				for (InterfaceFunction function : mother.functions){
+					methods.add(function)
+				}
+			}
+		}
+		
+		for (InterfaceFunction function: methods){
+			switch(function.visibility.charValue){
+				case new Character('#') : res+="protected "
+				case new Character('-') : res+="private "
+				default : res+="public "
+			}
+			res += function.returnType + " " + function.name + " ("+compileFunctionParameters(function)+")"+"{\n\t/*Implemented method*/\n}" 
+		}
+		
+		return res;
 	}
+	
+	
+	
 	/**
-	 * For every function, it returns a string containing all the parameters 
+	 * For a given function, it returns a string containing all the parameters 
 	 */
 	def compileFunctionParameters(Function function){
 		var res = ""
@@ -153,20 +178,13 @@ class UmlGenerator extends AbstractGenerator {
 	 */
 	private dispatch def compile(Class c) '''
 		class «c.name» «processUmlObject(c)»{
-			«val methodsToImplement = getMethodsToImplement(c)»
-			«IF methodsToImplement !== null && !methodsToImplement.empty»
-				«FOR method: methodsToImplement»
-					«method.compile»{}
-				«ENDFOR»
-			«ENDIF»
 			«IF c.params !== null && !c.params.empty»
 				«c.params.compile»
 			«ENDIF»
-					
 			«IF c.functions !== null && !c.functions.empty»
 				«c.functions.compile»
 			«ENDIF»
-			
+			«getMethodsToImplement(c)»
 		}
 	'''
 	/**
@@ -176,12 +194,6 @@ class UmlGenerator extends AbstractGenerator {
 		abstract class «aClass.name» «processUmlObject(aClass)»{
 			«aClass.params.compile»
 			«aClass.functions.compile»
-			«val methodsToImplement = getMethodsToImplement(aClass)»
-			«IF methodsToImplement !== null && !methodsToImplement.empty»
-				«FOR method: methodsToImplement»
-					«method.compile»{}
-				«ENDFOR»
-			«ENDIF»
 		}
 	'''
 	
@@ -249,7 +261,7 @@ class UmlGenerator extends AbstractGenerator {
 	 * Generate the code for a given interface function
 	 */
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF»«function.returnType» «function.name»(«compileFunctionParameters(function)»);
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»);
 	'''
 	/**
 	 * Generate the code for a given abstract function
