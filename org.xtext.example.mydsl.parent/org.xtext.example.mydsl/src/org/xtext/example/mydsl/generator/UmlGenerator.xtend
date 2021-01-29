@@ -3,7 +3,6 @@
  */
 package org.xtext.example.mydsl.generator
 
-import java.util.List
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
@@ -122,7 +121,7 @@ class UmlGenerator extends AbstractGenerator {
 	
 	/**
 	 * For every *.java file created, if the Class, or AbstractClass implements an interface, 
-	 * It returns the list of interfaces method that should be implemented
+	 * It returns a String with the implementation of super interfaces methods
 	 */
 	def String getMethodsToImplement(UmlObject umlObject){
 		if(!(umlObject instanceof Class || umlObject instanceof AbstractClass)) return ""
@@ -150,7 +149,7 @@ class UmlGenerator extends AbstractGenerator {
 				case new Character('-') : res+="private "
 				default : res+="public "
 			}
-			res += function.returnType + " " + function.name + " ("+compileFunctionParameters(function)+")"+"{\n\t/*Implemented method*/\n}" 
+			res += function.returnType + " " + function.name + " ("+compileFunctionParameters(function)+")"+"{\n\t/*Implemented method*/\n}\n"
 		}
 		
 		return res;
