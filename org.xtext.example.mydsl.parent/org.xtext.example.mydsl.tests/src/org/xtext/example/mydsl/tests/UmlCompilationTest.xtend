@@ -16,14 +16,14 @@ class UmlCompilationTest {
 	
 	@Test 
 	def ClassTest(){
-		'''public class NomClass {
-			parameter {}
-			function {}
-	}'''.assertCompilesTo('''
-	public Class NomClass {
-		
-	}
-	''')
+		'''
+			class NomClass {
+				parameter {}
+				function {}
+			}
+		'''.assertCompilesTo('''
+		class NomClass {}
+		''')
 	}
 	
 }
