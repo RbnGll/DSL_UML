@@ -3,13 +3,10 @@
  */
 package org.xtext.example.mydsl.validation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.validation.Check;
-import org.xtext.example.mydsl.uml.Heritage;
-import org.xtext.example.mydsl.uml.Implementation;
+import org.xtext.example.mydsl.uml.Extends;
+import org.xtext.example.mydsl.uml.Implements;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlObject;
@@ -41,15 +38,15 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkClass1ExistInLink(Link l) {
 		String className;
-		if (l instanceof Heritage) {
-			className = ((Heritage)l).getChildrenClass();
+		if (l instanceof Extends) {
+			className = ((Extends)l).getChildrenClass();
 			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {//TODO find good if
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.HERITAGE__CHILDREN_CLASS, UNDECLARED_CLASS);
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
-		}else if (l instanceof Implementation){
-			className =((Implementation)l).getChildrenClass();
+		}else if (l instanceof Implements){
+			className =((Implements)l).getChildrenClass();
 			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTATION__CHILDREN_CLASS, UNDECLARED_CLASS);
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass1();
@@ -62,15 +59,15 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkClass2ExistInLink(Link l) {
 		String className;
-		if (l instanceof Heritage) {
-			className = ((Heritage)l).getSuperClass();
+		if (l instanceof Extends) {
+			className = ((Extends)l).getSuperClass();
 			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.HERITAGE__SUPER_CLASS, UNDECLARED_CLASS);
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
 			}
-		}else if (l instanceof Implementation){
-			className =((Implementation)l).getMotherClass();
+		}else if (l instanceof Implements){
+			className =((Implements)l).getMotherClass();
 			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTATION__MOTHER_CLASS, UNDECLARED_CLASS);
+				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass2();

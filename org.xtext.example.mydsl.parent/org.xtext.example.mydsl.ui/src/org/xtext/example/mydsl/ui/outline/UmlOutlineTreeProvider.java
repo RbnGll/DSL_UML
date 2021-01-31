@@ -12,25 +12,21 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.xtext.ui.PluginImageHelper;
 import org.eclipse.xtext.ui.editor.outline.impl.DefaultOutlineTreeProvider;
-import org.eclipse.xtext.ui.editor.outline.impl.DocumentRootNode;
 import org.eclipse.xtext.ui.editor.utils.TextStyle;
 import org.eclipse.xtext.ui.label.StylerFactory;
 import org.xtext.example.mydsl.uml.AbstractClass;
 import org.xtext.example.mydsl.uml.AbstractFunction;
 import org.xtext.example.mydsl.uml.Association;
 import org.xtext.example.mydsl.uml.Class;
-import org.xtext.example.mydsl.uml.DefinedParameter;
+import org.xtext.example.mydsl.uml.DefinedAttribute;
 import org.xtext.example.mydsl.uml.Enum;
+import org.xtext.example.mydsl.uml.Extends;
 import org.xtext.example.mydsl.uml.Function;
 import org.xtext.example.mydsl.uml.FunctionParameter;
-import org.xtext.example.mydsl.uml.Heritage;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.InterfaceFunction;
 import org.xtext.example.mydsl.uml.Link;
-import org.xtext.example.mydsl.uml.Program;
-import org.xtext.example.mydsl.uml.Statement;
-import org.xtext.example.mydsl.uml.StaticParameter;
-import org.xtext.example.mydsl.uml.UmlObject;
+import org.xtext.example.mydsl.uml.StaticAttribute;
 
 
 
@@ -82,7 +78,7 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	 * 
 	 * @return
 	 */
-	public Object _text(DefinedParameter d) {
+	public Object _text(DefinedAttribute d) {
 
 		// Get the style for from the visibility
 		TextStyle textStyle = this.setColorFromVisibility(d.getVisibility());
@@ -91,7 +87,7 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 		String displayName = d.getName() + " : " + d.getType();
 		
 		// Check if the variable is static
-		if (d instanceof StaticParameter) {
+		if (d instanceof StaticAttribute) {
 			// Add static style
 			textStyle.setStyle(SWT.ITALIC);
 		}
@@ -212,8 +208,8 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
 	// Links
 
-	public Object _text(Heritage c) {
-		return "Heritage";
+	public Object _text(Extends c) {
+		return "Extends";
 	}
 
 	public Object _text(Association c) {

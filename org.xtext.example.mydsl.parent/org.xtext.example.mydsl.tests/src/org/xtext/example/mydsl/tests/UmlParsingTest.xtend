@@ -22,7 +22,7 @@ class UmlParsingTest {
 	def void classTest() {
 		result = parseHelper.parse('''
 			abstract class NomClass {
-				parameter {
+				attribute {
 					+ static int a;
 					# const String b;
 					-  int c;
@@ -40,7 +40,7 @@ class UmlParsingTest {
 	def void testClassWithFunctionMultipleParameters () {
 		result = parseHelper.parse('''
 			class NomClass {
-				parameter {
+				attribute {
 					+ static int a;
 					# const String b;
 					- int c;
@@ -72,7 +72,7 @@ class UmlParsingTest {
 	def void emptyClassTest(){
 		result = parseHelper.parse('''
 			abstract class EmptyClass {
-				parameter {
+				attribute {
 				} 
 				function {
 				}
@@ -133,7 +133,7 @@ class UmlParsingTest {
 	@Test
 	def void heritageTest(){
 		result = parseHelper.parse('''
-		heritage(NomClass, ParentClass);
+		extends(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
@@ -149,7 +149,7 @@ class UmlParsingTest {
 	@Test
 	def void implementationTest(){
 		result = parseHelper.parse('''
-		implementation(NomClass, ParentClass);
+		implements(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues

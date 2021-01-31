@@ -19,19 +19,19 @@ Statement:
 	
 // LINKS
 Link:
-	Heritage | Implementation | Relation; 
+	Extends | Implements | Relation; 
 
 
 Relation:
 	StrongAggregation | Association;
 
 	
-Implementation: 
-	'implementation' '(' motherClass=ID ',' childrenClass=ID ')' ';'
+Implements: 
+	'implements' '(' motherClass=ID ',' childrenClass=ID ')' ';'
 ;
 	
-Heritage:
-	'heritage' '(' superClass=ID ',' childrenClass=ID ')' ';'
+Extends:
+	'extends' '(' superClass=ID ',' childrenClass=ID ')' ';'
 ;
 
 
@@ -55,8 +55,8 @@ UmlObject:
 
 // Keep the parameter and the function
 Class: 'class' name=ID '{'
-    'parameter' '{'
-        (params+=DefinedParameter)*
+    'attribute' '{'
+        (attributes+=DefinedAttribute)*
     '}'
     'function' '{'
         (functions+=ClassicFunction)*
@@ -66,8 +66,8 @@ Class: 'class' name=ID '{'
 
 
 AbstractClass: 'abstract' 'class' name=ID '{'
-	'parameter' '{'
-		(params+=DefinedParameter)*
+	'attribute' '{'
+		(attributes+=DefinedAttribute)*
 	'}'
 	'function' '{'
 		(functions+= AbstractFunction)*
@@ -88,11 +88,11 @@ Interface: 'interface' name=ID '{'
 
 
 // Definition of a parameter 
-DefinedParameter: StaticParameter | ClassicParameter;
+DefinedAttribute: StaticAttribute | ClassicAttribute;
 
-StaticParameter: visibility=VISIBILITY 'static' modifier=MODIFIER? type=ID name=ID ';';
+StaticAttribute: visibility=VISIBILITY 'static' modifier=MODIFIER? type=ID name=ID ';';
 
-ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=ID name=ID ';';
+ClassicAttribute: visibility=VISIBILITY modifier=MODIFIER? type=ID name=ID ';';
 
 
 

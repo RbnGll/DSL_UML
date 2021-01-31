@@ -12,30 +12,45 @@ import org.junit.jupiter.api.^extension.ExtendWith
 class UmlCompilationTest {
 	@Inject extension CompilationTestHelper
 	
-	@Test 
-	def emptyClassTest(){
+	@Test
+	def void testEnum() {
 		'''
-			class EmptyClassTest {
-				parameter {}
+			enum TestEnum {
+				VALUE1, VALUE2, VALUE3;
+			}
+		'''.assertCompilesTo('''
+			public enum TestEnum {
+				VALUE1,
+				VALUE2,
+				VALUE3,
+			}''')
+	}
+	
+	@Test 
+	def testEmptyClass(){
+		'''
+			class TestEmptyClass {
+				attribute {}
 				function {}
 			}
 		'''.assertCompilesTo('''
-		class EmptyClassTest {
+		public class TestEmptyClass {
 		}''')
 	}
 	
+	
 	@Test
-	def void parameterVisibilityValueTest() {
+	def void testAttributeVisibilityValue() {
 		'''
-			class ParameterVisibiltyTest {
-				parameter {
+			class TestAttributeVisibilty {
+				attribute {
 					+ int publicInt;
 					- int privateInt;
 					# int protectedInt;
 				}
 				function{}
 		'''.assertCompilesTo('''
-			class ParameterVisibiltyTest {
+			public class TestAttributeVisibilty {
 				public int publicInt;
 				private int privateInt;
 				protected int protectedInt;
@@ -43,17 +58,17 @@ class UmlCompilationTest {
 	}
 	
 	@Test
-	def void parameterModifierValueTest() {
+	def void testAttributeModifierValue() {
 		'''
-			class ParameterModifierValueTest {
-				parameter {
+			class TestAttributeModifierValue {
+				attribute {
 					- static int staticInt;
 					- final int finalInt;
 					- static final int STATIC_FINAL_INT;
 				}
 				function {}
 		'''.assertCompilesTo('''
-			class ParameterModifierValueTest {
+			public class TestAttributeModifierValue {
 				private static int staticInt;
 				private final int finalInt;
 				private static final int STATIC_FINAL_INT;
@@ -61,10 +76,10 @@ class UmlCompilationTest {
 	}
 	
 	@Test
-	def primitiveAttributesTest(){
+	def testPrimitiveAttributes(){
 		'''
-			class PrimitiveAttributesTest {
-				parameter{
+			class TestPrimitiveAttributes {
+				attribute{
 					- byte by;
 					- short sh;
 					- int i;
@@ -75,7 +90,7 @@ class UmlCompilationTest {
 				}
 				function{}
 		'''.assertCompilesTo('''
-			class PrimitiveAttributesTest {
+			public class TestPrimitiveAttributes {
 				private byte by;
 				private short sh;
 				private int i;
@@ -87,10 +102,58 @@ class UmlCompilationTest {
 	}
 	
 	@Test
-	def void functionVisibilityValueTest() {
+	def void testNonPrimitiveAttributes() {
 		'''
-			class FunctionVisibilityValueTest {
-				parameter{}
+			class MyObject{
+						attribute{}
+						function{}
+					}
+					class TestNonPrimitiveAttributes {
+						attribute {
+							- String a;
+							- MyObject b;
+					}
+					function{}
+				'''.assertCompilesTo('''
+			MULTIPLE FILES WERE GENERATED
+			
+			File 1 : /myProject/./src-gen/MyObject.java
+			
+			public class MyObject {
+			}
+			File 2 : /myProject/./src-gen/TestNonPrimitiveAttributes.java
+			
+			public class TestNonPrimitiveAttributes {
+				private String a;
+				private MyObject b;
+			}
+			''')
+	}
+	
+	@Test
+	def void testConstructor() {
+		'''
+			class TestConstructor {
+				attribute{}
+				function{
+					+ ConstructorTest();
+				}
+			}
+		'''.assertCompilesTo('''
+			public class TestConstructor {
+				public ConstructorTest(){
+					// TODO - Auto generated method
+				}
+			}
+			'''
+		)
+	}
+	
+	@Test
+	def void testFunctionVisibilityValue() {
+		'''
+			class TestFunctionVisibilityValue {
+				attribute{}
 				function{
 					+ void publicFunction();
 					- void privateFunction();
@@ -98,7 +161,7 @@ class UmlCompilationTest {
 				}
 			}
 		'''.assertCompilesTo('''
-			class FunctionVisibilityValueTest {
+			public class TestFunctionVisibilityValue {
 				public void publicFunction(){
 					// TODO - Auto generated method
 				}
@@ -112,12 +175,30 @@ class UmlCompilationTest {
 		
 	}
 	
+	@Test
+	def void testStaticFunction() {
+		'''
+			class TestStaticFunction {
+				attribute{}
+				function{
+					+ static void main(String args);
+				}
+			}
+		'''.assertCompilesTo('''
+			public class TestStaticFunction {
+				public static void main (String args){
+					// TODO - Auto generated method
+				}
+			}
+		''')
+	}
+	
 	
 	@Test
-	def void primitiveFunctionReturnTypeTest() {
+	def void testPrimitiveFunctionReturnType() {
 		'''
-			class PrimitiveFunctionReturnTypeTest {
-				parameter{}
+			class TestPrimitiveFunctionReturnType {
+				attribute{}
 				function{
 					+ void voidFunction();
 					+ byte byteFunction();
@@ -129,7 +210,7 @@ class UmlCompilationTest {
 				}
 			}
 		'''.assertCompilesTo('''
-			class PrimitiveFunctionReturnTypeTest {
+			public class TestPrimitiveFunctionReturnType {
 				public void voidFunction(){
 					// TODO - Auto generated method
 				}
@@ -155,47 +236,127 @@ class UmlCompilationTest {
 	}
 	
 	@Test
-	def void constructorTest() {
+	def void testNonPrimitiveFunctionReturnType() {
 		'''
-			class ConstructorTest {
-				parameter{}
-				function{
-					+ ConstructorTest();
-				}
-			}
+			class MyObject{
+						attribute{}
+						function{}
+					}
+					class TestNonPrimitiveAttributes {
+						attribute {
+							- String a;
+							- MyObject b;
+					}
+					function{
+						+ MyObject myObjectFunction ();
+					}
 		'''.assertCompilesTo('''
-			class ConstructorTest {
-				public ConstructorTest(){
+			MULTIPLE FILES WERE GENERATED
+			
+			File 1 : /myProject/./src-gen/MyObject.java
+			
+			public class MyObject {
+			}
+			File 2 : /myProject/./src-gen/TestNonPrimitiveAttributes.java
+			
+			public class TestNonPrimitiveAttributes {
+				private String a;
+				private MyObject b;
+				public MyObject myObjectFunction(){
 					// TODO - Auto generated method
 				}
-			}
-			'''
-		)
-	}
-	
-	@Test
-	def void astractClassTest() {
-		'''
-			abstract class AbstractClass {
-				parameter{}
-				function{}
-			}
-		'''.assertCompilesTo('''
-			abstract class AbstractClass {
 			}''')
 	}
 	
 	@Test
-	def void abstractClassWithAtributesAndMethodsTest() {
+	def void testFunctionFinalParameter() {
 		'''
-			abstract class AbstractClass {
-				parameter{}
+			class TestFunctionFinalParameter {
+				attribute{}
+				function{
+					+ void myFunction(final int a);
+				}
+			}
+		'''.assertCompilesTo('''
+			public class TestFunctionFinalParameter {
+				public void myFunction(final int a){
+					// TODO - Auto generated method
+				}
+			}''')
+	}
+	
+	@Test
+	def void testPrimitiveTypeFunctionParameter() {
+		'''
+		class TestPrimitiveTypeFunctionParameter {
+			attribute{}
+			function{
+				+ void myFunction(byte by, short sh, int i, float f, double d, boolean b);
+			}
+		}
+	'''.assertCompilesTo('''
+		public class TestPrimitiveTypeFunctionParameter {
+			public void myFunction(byte by, short sh, int i, float f, double d, boolean b){
+				// TODO - Auto generated method
+			}
+		}''')
+	}
+	
+	@Test
+	def void testNonPrimitiveTypeFunctionParameter() {
+		'''
+			class MyObject {
+				attribute{}
+				function{}
+			}
+			class TestNonPrimitiveTypeFunctionParameter {
+				attribute{}
+				function{
+					+ void myFunction(String str, MyObject o);
+				}
+			}
+		'''.assertCompilesTo('''
+			MULTIPLE FILES WERE GENERATED
+			
+			File 1 : /myProject/./src-gen/MyObject.java
+			
+			public class MyObject {
+			}
+			File 2 : /myProject/./src-gen/TestNonPrimitiveTypeFunctionParameter.java
+			
+			public class TestNonPrimitiveTypeFunctionParameter {
+				public void myFunction (String str, MyObject o){
+					// TODO - Auto generated method
+				}
+			}''')
+	}
+	
+	@Test
+	def void testEmptyAbstractClass() {
+		'''
+			abstract class TestAbstractClass {
+				attribute{}
+				function{}
+			}
+		'''.assertCompilesTo('''
+			public abstract class TestAbstractClass {
+			}''')
+	}
+	
+	@Test
+	def void testAbstractClassWithAtributesAndMethods() {
+		'''
+			abstract class TestAbstractClass {
+				attribute{
+					+ int A;
+				}
 				function{
 					+ abstract void abstractFunction();
 				}
 			}
 		'''.assertCompilesTo('''
-			abstract class AbstractClass {
+			public abstract class TestAbstractClass {
+				public int A;
 				public abstract void abstractFunction(){
 					// TODO - Auto generated method
 				}
@@ -204,27 +365,85 @@ class UmlCompilationTest {
 	}
 	
 	@Test
-	def void extendTest() {
+	def void testEmptyInterface() {
+		'''
+			interface TestInterface{
+				function{}
+			}
+		'''.assertCompilesTo('''
+			public interface TestInterface {
+			}''')
+	}
+	
+	@Test
+	def void testInterfaceWithAFunction() {
+		'''
+			interface TestInterface {
+				function{
+					+ void testFunction ();
+				}
+			}
+		'''.assertCompilesTo('''
+		public interface TestInterface {
+			public void testFunction();
+		}''')
+	}
+	
+	
+	@Test
+	def void testExtends() {
 		'''
 			class MotherClass {
-				parameter{}
+				attribute{}
 				function{}
 			}
 			class DaughterClass {
-				parameter{}
+				attribute{}
 				function{}
 			}
-			heritage(MotherClass, DaughterClass);
+			extends(MotherClass, DaughterClass);
 		'''.assertCompilesTo('''
 			MULTIPLE FILES WERE GENERATED
 			
 			File 1 : /myProject/./src-gen/DaughterClass.java
 			
-			class DaughterClass extends MotherClass {
+			public class DaughterClass extends MotherClass {
 			}
 			File 2 : /myProject/./src-gen/MotherClass.java
 			
-			class MotherClass {
-			}''')
+			public class MotherClass {
+			}
+			''')
+	}
+	
+	@Test
+	def void testImplements() {
+		'''
+			interface SuperInterface {
+				function{
+					+ void myFunction(int a);
+				}
+			}
+			class SuperInterfaceImpl {
+				attribute{}
+				function{}
+			}
+			implements(SuperInterface, SuperInterfaceImpl);
+		'''.assertCompilesTo('''
+			MULTIPLE FILES WERE GENERATED
+			
+			File 1 : /myProject/./src-gen/SuperInterface.java
+			
+			public interface SuperInterface {
+				public void myFunction(int a);
+			}
+			File 2 : /myProject/./src-gen/SuperInterfaceImpl.java
+			
+			public class SuperInterfaceImpl implements SuperInterface {
+				public void myFunction(int a){
+					// TODO - Implemented method
+				}
+			}
+			''')
 	}
 }
