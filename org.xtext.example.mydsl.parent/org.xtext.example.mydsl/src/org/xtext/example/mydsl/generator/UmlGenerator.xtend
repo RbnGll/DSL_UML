@@ -153,9 +153,7 @@ class UmlGenerator extends AbstractGenerator {
 		}
 		
 		return res;
-	}
-	
-	
+	}	
 	
 	/**
 	 * For a given function, it returns a string containing all the parameters 
@@ -177,15 +175,9 @@ class UmlGenerator extends AbstractGenerator {
 	 */
 	private dispatch def compile(Class c) '''
 		class «c.name» «processUmlObject(c)»{
-			«IF c.params !== null && !c.params.empty»
-				«c.params.compile»
-			«ENDIF»
-			«IF c.functions !== null && !c.functions.empty»
-				«c.functions.compile»
-			«ENDIF»
+			«IF c.params !== null && !c.params.empty»«c.params.compile»«ENDIF»«IF c.functions !== null && !c.functions.empty»«c.functions.compile»«ENDIF»
 			«getMethodsToImplement(c)»
-		}
-	'''
+		}'''
 	/**
 	 * Generate the code for a given abstract class
 	 */
@@ -194,7 +186,9 @@ class UmlGenerator extends AbstractGenerator {
 			«aClass.params.compile»
 			«aClass.functions.compile»
 		}
-	'''
+		'''
+		
+		
 	
 	/**
 	 * Generate the code for an interface
@@ -202,8 +196,7 @@ class UmlGenerator extends AbstractGenerator {
 	private dispatch def compile (Interface umlInterface)'''
 		interface «umlInterface.name»{
 			«umlInterface.functions.compile»
-		}
-	'''
+		}'''
 	/**
 	 * Generate the code for an enum
 	 */
@@ -212,8 +205,7 @@ class UmlGenerator extends AbstractGenerator {
 			«FOR umlEnumConstant: umlEnum.params»
 				«umlEnumConstant.name»,
 			«ENDFOR»
-		}
-	'''
+		}'''
 	
 	/**
 	 * All ELists<T> should be compiled here, because of Java erasure
@@ -229,7 +221,7 @@ class UmlGenerator extends AbstractGenerator {
 			«IF list.get(0) instanceof DefinedParameter»
 				«FOR param : list as EList<DefinedParameter>»
 					«IF param.visibility.charValue == new Character('#')»protected«ELSEIF param.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «IF param instanceof StaticParameter»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
-				«ENDFOR»
+				«ENDFOR»	
 			«ELSEIF list.get(0) instanceof InterfaceFunction»
 				«FOR function : list as EList<InterfaceFunction>»
 					«IF function instanceof InterfaceFunction»
@@ -238,34 +230,30 @@ class UmlGenerator extends AbstractGenerator {
 				«ENDFOR»
 			«ELSEIF list.get(0) instanceof Function»
 				«FOR function : list as EList<Function>»
-				«function.compile»
+					«function.compile»
 				«ENDFOR»
 			«ELSEIF list.get(0) instanceof AbstractFunction»
 				«FOR function : list as EList<AbstractFunction>»
 					«function.compile»
 				«ENDFOR»
 			«ENDIF»
-		«ENDIF»
-	'''
+		«ENDIF»'''
 					
 	/**
 	 * Generate the code for a given Function
 	 */
 	private dispatch def compile (Function function) '''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»){ 
-			// TODO - Auto generated method
-		}
-	'''
+	«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»){
+		// TODO - Auto generated method
+	}'''
 	/**
 	 * Generate the code for a given interface function
 	 */
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»);
-	'''
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»);'''
 	/**
 	 * Generate the code for a given abstract function
 	 */
 	private dispatch def compile (AbstractFunction function)'''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»(«compileFunctionParameters(function)»);
-	''' 
+		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»(«compileFunctionParameters(function)»);''' 
 }

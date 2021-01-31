@@ -70,7 +70,7 @@ AbstractClass: 'abstract' 'class' name=ID '{'
 		(params+=DefinedParameter)*
 	'}'
 	'function' '{'
-		(functions+=AbstractFunction)*
+		(functions+= AbstractFunction)*
 	'}'
 '}'
 ;
@@ -110,10 +110,11 @@ ClassicFunction: visibility=VISIBILITY returnType=ID name=ID'('
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
-AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=ID name=ID'(' 
+AbstractFunction: visibility=VISIBILITY 'abstract' returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';'
 ;
+
 
 InterfaceFunction: visibility=VISIBILITY returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	

@@ -59,7 +59,6 @@ class UmlParsingTest {
 	def void testInterface() {
 		result = parseHelper.parse('''
 			interface Runner {
-				parameter {}
 				function {
 					+ void run();
 				}
@@ -87,9 +86,6 @@ class UmlParsingTest {
 	def void interfaceTest(){
 		result = parseHelper.parse('''
 			interface NomInterface {
-				parameter {
-					+ static int a;
-				} 
 				function {
 					+ void test();
 				}
