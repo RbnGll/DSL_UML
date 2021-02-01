@@ -24,8 +24,8 @@ class UmlParsingTest {
 			abstract class NomClass {
 				attribute {
 					+ abstract static int a;
-					# abstract const String b;
-					- abstract int c;
+					# const String b;
+					- int c;
 				} 
 				function {
 					+ void test();
