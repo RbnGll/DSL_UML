@@ -23,9 +23,9 @@ class UmlParsingTest {
 		result = parseHelper.parse('''
 			abstract class NomClass {
 				attribute {
-					+ static int a;
-					# const String b;
-					-  int c;
+					+ abstract static int a;
+					# abstract const String b;
+					- abstract int c;
 				} 
 				function {
 					+ void test();
@@ -164,9 +164,18 @@ class UmlParsingTest {
 		result.assertNoIssues
 	}
 	
+	// TODO : To check, I put here additional class in order to don't have the warning, but don't work.
 	@Test
 	def void associationTest(){
 		result = parseHelper.parse('''
+		class NomClass {
+			attribute {} 
+			function {}
+		}
+		class AutreClass {
+			attribute {} 
+			function {}
+		}
 		association(NomClass, AutreClass, nomLiaison, 10, 10);
 		''')
 		Assertions.assertNotNull(result)
