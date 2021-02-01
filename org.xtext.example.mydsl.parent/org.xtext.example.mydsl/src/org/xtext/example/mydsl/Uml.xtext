@@ -65,7 +65,7 @@ Class: 'class' name=ID '{'
 
 
 
-AbstractClass: 'abstract' 'class' name=ID '{'
+AbstractClass: abstract=ABSTRACT 'class' name=ID '{'
 	'attribute' '{'
 		(attributes+=DefinedAttribute)*
 	'}'
@@ -94,23 +94,18 @@ StaticAttribute: visibility=VISIBILITY static=STATIC final=FINAL? type=ID name=I
 
 ClassicAttribute: visibility=VISIBILITY final=FINAL? type=ID name=ID ';';
 
+FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
 
-
+// Do not delete as it is used in the generator to process parameters in a generic way
 Function: 
 	ClassicFunction | AbstractFunction | InterfaceFunction
 ;
- 
-// TODO :: Pour te type, penser que l'on peut avoir une class et pas seulement que des type primitif
-FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
 
-
-// TODO :: Peut-être merger les différentes function en une seul ? 
-// Here * --> 0 or more
 ClassicFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
-	(params+=FunctionParameter ','?)* 	
+	(params+=FunctionParameter ','?)* // Here * --> 0 or more	
 ')' ';';
 
-AbstractFunction: visibility=VISIBILITY 'abstract' static=STATIC? final=FINAL? returnType=ID name=ID'(' 
+AbstractFunction: visibility=VISIBILITY abstract=ABSTRACT? static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';'
 ;
@@ -125,18 +120,12 @@ Enum: 'enum' name=ID '{'
 	(params+=EnumConstant)+	
 '}';
 
-
 EnumConstant: name=ID ';';
 
-
-
-// PACKAGE
 // TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
 Package: 'package' name=ID '{' 
 	(packageName+=ID ','?)+
 '}';
-
-
 
 
 terminal VISIBILITY returns ecore::EChar: 
@@ -147,5 +136,8 @@ terminal FINAL returns ecore::EString:
 
 terminal STATIC returns ecore::EString:
 	'static';
+
+terminal ABSTRACT returns ecore::EString:
+	'abstract';
 
 	

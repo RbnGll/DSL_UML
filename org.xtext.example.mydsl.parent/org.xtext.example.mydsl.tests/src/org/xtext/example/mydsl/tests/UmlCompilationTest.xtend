@@ -144,8 +144,7 @@ class UmlCompilationTest {
 				public ConstructorTest(){
 					// TODO - Auto generated method
 				}
-			}
-			'''
+			}'''
 		)
 	}
 	
@@ -186,11 +185,10 @@ class UmlCompilationTest {
 			}
 		'''.assertCompilesTo('''
 			public class TestStaticFunction {
-				public static void main (String args){
+				public static void main(String args){
 					// TODO - Auto generated method
 				}
-			}
-		''')
+			}''')
 	}
 	
 	
@@ -265,7 +263,8 @@ class UmlCompilationTest {
 				public MyObject myObjectFunction(){
 					// TODO - Auto generated method
 				}
-			}''')
+			}
+			''')
 	}
 	
 	@Test
@@ -325,10 +324,11 @@ class UmlCompilationTest {
 			File 2 : /myProject/./src-gen/TestNonPrimitiveTypeFunctionParameter.java
 			
 			public class TestNonPrimitiveTypeFunctionParameter {
-				public void myFunction (String str, MyObject o){
+				public void myFunction(String str, MyObject o){
 					// TODO - Auto generated method
 				}
-			}''')
+			}
+			''')
 	}
 	
 	@Test
@@ -360,8 +360,7 @@ class UmlCompilationTest {
 				public abstract void abstractFunction(){
 					// TODO - Auto generated method
 				}
-			}
-		''')
+			}''')
 	}
 	
 	@Test

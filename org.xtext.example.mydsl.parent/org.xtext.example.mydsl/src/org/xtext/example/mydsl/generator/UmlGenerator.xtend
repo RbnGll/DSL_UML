@@ -21,6 +21,7 @@ import org.xtext.example.mydsl.uml.InterfaceFunction
 import org.xtext.example.mydsl.uml.Link
 import org.xtext.example.mydsl.uml.StaticAttribute
 import org.xtext.example.mydsl.uml.UmlObject
+import org.xtext.example.mydsl.uml.ClassicFunction
 
 // TODO
 /*
@@ -149,7 +150,7 @@ class UmlGenerator extends AbstractGenerator {
 				case new Character('-') : res+="private "
 				default : res+="public "
 			}
-			res += function.returnType + " " + function.name + "("+compileFunctionParameters(function)+")"+"{\n\t// TODO - Implemented method\n}\n"
+			res += function.returnType + " " + function.name + "("+compileFunctionParameters(function as Function)+")"+"{\n\t// TODO - Implemented method\n}\n"
 		}
 		
 		return res;
@@ -161,8 +162,8 @@ class UmlGenerator extends AbstractGenerator {
 	def compileFunctionParameters(Function function){
 		var res = ""
 		for(param: function.params){
-			if (param.modifier !== null){
-				res += param.modifier+" "
+			if (param.final !== null){
+				res += "final "
 			}
 			res+=param.type + " "+param.name+", "
 		}
@@ -185,8 +186,7 @@ class UmlGenerator extends AbstractGenerator {
 		public abstract class «aClass.name» «processUmlObject(aClass)»{
 			«aClass.attributes.compile»
 			«aClass.functions.compile»
-		}
-		'''
+		}'''
 		
 		
 	
@@ -220,7 +220,7 @@ class UmlGenerator extends AbstractGenerator {
 		«IF !list.empty»
 			«IF list.get(0) instanceof DefinedAttribute»
 				«FOR param : list as EList<DefinedAttribute>»
-					«IF param.visibility.charValue == new Character('#')»protected«ELSEIF param.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «IF param instanceof StaticAttribute»static «ENDIF»«IF param.modifier !== null»«param.modifier» «ENDIF»«param.type» «param.name»;
+					«IF param.visibility.charValue == new Character('#')»protected«ELSEIF param.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «IF param instanceof StaticAttribute»static «ENDIF»«IF param.final !== null»final «ENDIF»«param.type» «param.name»;
 				«ENDFOR»	
 			«ELSEIF list.get(0) instanceof InterfaceFunction»
 				«FOR function : list as EList<InterfaceFunction>»
@@ -242,18 +242,20 @@ class UmlGenerator extends AbstractGenerator {
 	/**
 	 * Generate the code for a given Function
 	 */
-	private dispatch def compile (Function function) '''
-	«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»){
+	private dispatch def compile (ClassicFunction function) '''
+	«IF function.visibility.charValue == new Character('#')»protected «ELSEIF function.visibility.charValue == new Character('-')»private «ELSE»public «ENDIF»«IF function.static !== null»static «ENDIF»«IF function.final !== null»final «ENDIF»«function.returnType»«IF function.name !== null» «function.name»«ENDIF»(«compileFunctionParameters(function as Function)»){
 		// TODO - Auto generated method
 	}'''
 	/**
 	 * Generate the code for a given interface function
 	 */
 	private dispatch def compile (InterfaceFunction function) '''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» «function.returnType» «function.name»(«compileFunctionParameters(function)»);'''
+		«IF function.visibility.charValue == new Character('#')»protected «ELSEIF function.visibility.charValue == new Character('-')»private «ELSE»public «ENDIF»«IF function.static !== null»static «ENDIF»«IF function.final !== null»final «ENDIF»«function.returnType»«IF function.name !== null» «function.name»«ENDIF»(«compileFunctionParameters(function as Function)»);'''
 	/**
 	 * Generate the code for a given abstract function
 	 */
 	private dispatch def compile (AbstractFunction function)'''
-		«IF function.visibility.charValue == new Character('#')»protected«ELSEIF function.visibility.charValue == new Character('-')»private«ELSE»public«ENDIF» abstract «function.returnType» «function.name»(«compileFunctionParameters(function)»);''' 
+		«IF function.visibility.charValue == new Character('#')»protected «ELSEIF function.visibility.charValue == new Character('-')»private «ELSE»public «ENDIF»«IF function.abstract !== null»abstract «ENDIF»«IF function.static !== null»static «ENDIF»«IF function.final !== null»final «ENDIF»«function.returnType»«IF function.name !== null» «function.name»«ENDIF»(«compileFunctionParameters(function as Function)»){
+			// TODO - Auto generated method
+		}''' 
 }
