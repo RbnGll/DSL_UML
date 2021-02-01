@@ -90,9 +90,9 @@ Interface: 'interface' name=ID '{'
 // Definition of a parameter 
 DefinedAttribute: StaticAttribute | ClassicAttribute;
 
-StaticAttribute: visibility=VISIBILITY 'static' modifier=MODIFIER? type=ID name=ID ';';
+StaticAttribute: visibility=VISIBILITY static=STATIC final=FINAL? type=ID name=ID ';';
 
-ClassicAttribute: visibility=VISIBILITY modifier=MODIFIER? type=ID name=ID ';';
+ClassicAttribute: visibility=VISIBILITY final=FINAL? type=ID name=ID ';';
 
 
 
@@ -101,22 +101,22 @@ Function:
 ;
  
 // TODO :: Pour te type, penser que l'on peut avoir une class et pas seulement que des type primitif
-FunctionParameter: visibility=VISIBILITY? modifier=MODIFIER? type=ID name=ID;
+FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
 
 
 // TODO :: Peut-être merger les différentes function en une seul ? 
 // Here * --> 0 or more
-ClassicFunction: visibility=VISIBILITY returnType=ID name=ID'(' 
+ClassicFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
-AbstractFunction: visibility=VISIBILITY 'abstract' returnType=ID name=ID'(' 
+AbstractFunction: visibility=VISIBILITY 'abstract' static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';'
 ;
 
 
-InterfaceFunction: visibility=VISIBILITY returnType=ID name=ID'(' 
+InterfaceFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
@@ -142,12 +142,10 @@ Package: 'package' name=ID '{'
 terminal VISIBILITY returns ecore::EChar: 
 	'+' | '-' | '#' | '~';
 
-terminal MODIFIER returns ecore::EString:
-	'final' | 'const';
+terminal FINAL returns ecore::EString:
+	'final';
 
-//TYPE returns ecore::EString:
-//	'string' | 'String' | 'int' | 'boolean' | 'long' | 'void'
-//;
-
+terminal STATIC returns ecore::EString:
+	'static';
 
 	
