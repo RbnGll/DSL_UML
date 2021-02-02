@@ -22,10 +22,10 @@ class UmlParsingTest {
 	def void classTest() {
 		result = parseHelper.parse('''
 			abstract class NomClass {
-				parameter {
+				attribute {
 					+ static int a;
-					# const String b;
-					-  int c;
+					# final String b;
+					- int c;
 				} 
 				function {
 					+ void test();
@@ -40,9 +40,9 @@ class UmlParsingTest {
 	def void testClassWithFunctionMultipleParameters () {
 		result = parseHelper.parse('''
 			class NomClass {
-				parameter {
+				attribute {
 					+ static int a;
-					# const String b;
+					# final String b;
 					- int c;
 				} 
 				function {
@@ -72,7 +72,7 @@ class UmlParsingTest {
 	def void emptyClassTest(){
 		result = parseHelper.parse('''
 			abstract class EmptyClass {
-				parameter {
+				attribute {
 				} 
 				function {
 				}
@@ -133,7 +133,7 @@ class UmlParsingTest {
 	@Test
 	def void heritageTest(){
 		result = parseHelper.parse('''
-		heritage(NomClass, ParentClass);
+		extends(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
@@ -149,7 +149,7 @@ class UmlParsingTest {
 	@Test
 	def void implementationTest(){
 		result = parseHelper.parse('''
-		implementation(NomClass, ParentClass);
+		implements(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
 		result.assertNoIssues
@@ -164,9 +164,18 @@ class UmlParsingTest {
 		result.assertNoIssues
 	}
 	
+	// TODO : To check, I put here additional class in order to don't have the warning, but don't work.
 	@Test
 	def void associationTest(){
 		result = parseHelper.parse('''
+		class NomClass {
+			attribute {} 
+			function {}
+		}
+		class AutreClass {
+			attribute {} 
+			function {}
+		}
 		association(NomClass, AutreClass, nomLiaison, 10, 10);
 		''')
 		Assertions.assertNotNull(result)

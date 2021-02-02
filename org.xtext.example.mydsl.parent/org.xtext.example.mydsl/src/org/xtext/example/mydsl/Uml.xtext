@@ -19,19 +19,19 @@ Statement:
 	
 // LINKS
 Link:
-	Heritage | Implementation | Relation; 
+	Extends | Implements | Relation; 
 
 
 Relation:
 	StrongAggregation | Association;
 
 	
-Implementation: 
-	'implementation' '(' motherClass=ID ',' childrenClass=ID ')' ';'
+Implements: 
+	'implements' '(' motherClass=ID ',' childrenClass=ID ')' ';'
 ;
 	
-Heritage:
-	'heritage' '(' superClass=ID ',' childrenClass=ID ')' ';'
+Extends:
+	'extends' '(' superClass=ID ',' childrenClass=ID ')' ';'
 ;
 
 
@@ -55,8 +55,8 @@ UmlObject:
 
 // Keep the parameter and the function
 Class: 'class' name=ID '{'
-    'parameter' '{'
-        (params+=DefinedParameter)*
+    'attribute' '{'
+        (attributes+=DefinedAttribute)*
     '}'
     'function' '{'
         (functions+=ClassicFunction)*
@@ -65,12 +65,12 @@ Class: 'class' name=ID '{'
 
 
 
-AbstractClass: 'abstract' 'class' name=ID '{'
-	'parameter' '{'
-		(params+=DefinedParameter)*
+AbstractClass: abstract=ABSTRACT 'class' name=ID '{'
+	'attribute' '{'
+		(attributes+=DefinedAttribute)*
 	'}'
 	'function' '{'
-		(functions+=AbstractFunction)*
+		(functions+= AbstractFunction)*
 	'}'
 '}'
 ;
@@ -88,34 +88,30 @@ Interface: 'interface' name=ID '{'
 
 
 // Definition of a parameter 
-DefinedParameter: StaticParameter | ClassicParameter;
+DefinedAttribute: StaticAttribute | ClassicAttribute;
 
-StaticParameter: visibility=VISIBILITY 'static' modifier=MODIFIER? type=TYPE name=ID ';';
+StaticAttribute: visibility=VISIBILITY static=STATIC final=FINAL? type=ID name=ID ';';
 
-ClassicParameter: visibility=VISIBILITY modifier=MODIFIER? type=TYPE name=ID ';';
+ClassicAttribute: visibility=VISIBILITY final=FINAL? type=ID name=ID ';';
 
+FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
 
-
+// Do not delete as it is used in the generator to process parameters in a generic way
 Function: 
 	ClassicFunction | AbstractFunction | InterfaceFunction
 ;
- 
-// TODO :: Pour le type, penser que l'on peut avoir une class et pas seulement que des type primitif
-FunctionParameter: modifier=MODIFIER? type=TYPE name=ID;
 
-
-// TODO :: Peut-être merger les différentes function en une seul ? 
-// Here * --> 0 or more
-ClassicFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
-	(params+=FunctionParameter ','?)* 	
+ClassicFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
+	(params+=FunctionParameter ','?)* // Here * --> 0 or more	
 ')' ';';
 
-AbstractFunction: visibility=VISIBILITY 'abstract'? returnType=TYPE name=ID'(' 
+AbstractFunction: visibility=VISIBILITY abstract=ABSTRACT? static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';'
 ;
 
-InterfaceFunction: visibility=VISIBILITY returnType=TYPE name=ID'(' 
+
+InterfaceFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
@@ -124,29 +120,24 @@ Enum: 'enum' name=ID '{'
 	(params+=EnumConstant)+	
 '}';
 
-
 EnumConstant: name=ID ';';
 
-
-
-// PACKAGE
 // TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
 Package: 'package' name=ID '{' 
 	(packageName+=ID ','?)+
 '}';
 
 
-
-
-VISIBILITY returns ecore::EChar: 
+terminal VISIBILITY returns ecore::EChar: 
 	'+' | '-' | '#' | '~';
 
-MODIFIER returns ecore::EString:
-	'final' | 'const';
+terminal FINAL returns ecore::EString:
+	'final';
 
-TYPE returns ecore::EString:
-	'string' | 'String' | 'int' | 'boolean' | 'long' | 'void'
-;
+terminal STATIC returns ecore::EString:
+	'static';
 
+terminal ABSTRACT returns ecore::EString:
+	'abstract';
 
 	
