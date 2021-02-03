@@ -30,4 +30,16 @@ Produit une proposition de modification lorsque:
 
 Auteur: Robin Guill
 
-## [Tests](hhttps://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/tree/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.tests/src/org/xtext/example/mydsl/tests)
+## [Tests](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/tree/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.tests/src/org/xtext/example/mydsl/tests)
+
+### Tests sur le parsing
+
+Test unitaire sur le bon déroulement du parsing 
+
+Auteurs: Brieg Daniel, Régis Graptin, Robin Guill
+### Tests sur le générateur
+### Tests sur le validateur
+
+Test unitaire sur la bonne validation du validateur
+
+Auteur: Robin Guill
