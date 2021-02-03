@@ -4,11 +4,11 @@ import com.google.inject.Inject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
 import org.xtext.example.mydsl.uml.Program
-import org.eclipse.xtext.testing.validation.ValidationTestHelper
 
 @ExtendWith(InjectionExtension)
 @InjectWith(UmlInjectorProvider)
@@ -133,6 +133,8 @@ class UmlParsingTest {
 	@Test
 	def void heritageTest(){
 		result = parseHelper.parse('''
+		class NomClass{attribute{} function{}}
+		class ParentClass{attribute{} function{}}
 		extends(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
@@ -149,6 +151,8 @@ class UmlParsingTest {
 	@Test
 	def void implementationTest(){
 		result = parseHelper.parse('''
+		class NomClass{attribute{} function{}}
+		class ParentClass{attribute{} function{}}
 		implements(NomClass, ParentClass);
 		''')
 		Assertions.assertNotNull(result)
@@ -158,6 +162,8 @@ class UmlParsingTest {
 	@Test
 	def void strongAggregationTest(){
 		result = parseHelper.parse('''
+		class NomClass{attribute{} function{}}
+		class AutreClass{attribute{} function{}}
 		strongAssociation(NomClass, AutreClass, nomLiaison, 10);
 		''')
 		Assertions.assertNotNull(result)
