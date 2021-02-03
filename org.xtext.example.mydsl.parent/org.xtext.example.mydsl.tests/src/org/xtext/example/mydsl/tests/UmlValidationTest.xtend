@@ -9,6 +9,9 @@ import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.xtext.example.mydsl.uml.Program
 import org.junit.jupiter.api.Test
 import static org.junit.Assert.assertFalse
+import org.junit.jupiter.api.Assertions
+import org.xtext.example.mydsl.validation.UmlValidator
+import org.xtext.example.mydsl.uml.UmlPackage
 
 @ExtendWith(InjectionExtension)
 @InjectWith(UmlInjectorProvider)
@@ -19,23 +22,26 @@ class UmlValidationTest {
 	
 	@Test
 	def void TestInterfaceNameStartsWithCapitalTest() {
-			assertFalse(true)
+			result = parseHelper.parse('''
+				interface foo {function{}}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertWarning(UmlPackage.Literals.INTERFACE,UmlValidator.INVALID_NAME)
 	}
 	
 	@Test
     def void TestEnumValuesShouldBeUpperCaseTest() {
-    			assertFalse(true)
+    	assertFalse(true)
     }
 	
 	@Test
 	def void TestUmlObjectNamesAllDifferentTest() {
-				assertFalse(true)
-
+		assertFalse(true)
 	}
 	
 	@Test
 	def void TestClassAttributesAllDifferentTest() {
-				assertFalse(true)
+		assertFalse(true)
 	}
 	
 	@Test
