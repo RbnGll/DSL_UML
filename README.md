@@ -1,8 +1,6 @@
 # Projet DSL 
 
-Implémentation d'un langage qui traduit en langage plus complexe, ici le java.
-
-
+Implémentation d'un langage simplifier permettant la génération de code dans un language plus complexe. Ici, notre service propose pour l'instant du java.
 
 
 ## Déclaration des classes
@@ -89,20 +87,37 @@ interface Union {
 }
 ```
 
+### L'énumération
+
+Déclaration d'une énumération.
+
+```
+enum Enumeration {
+	VALUE;
+	NONE;
+}
+```
+
 
 ## Les relations entre les objets
+
+Il est possible d'exprimer des relations entre les différentes classes.
 
 
 ### L'héritage
 
-L'héritage entre deux classes s'éxprime par : 
 
 ```
 extends(Parent, Child);
 ```
 
-### L'association 
+### L'implémentation 
 
+```
+implements(Union, Test);
+```
+
+### L'association 
 
 ```
 association(Class1, Class2, nameRelation, 10, 20);
