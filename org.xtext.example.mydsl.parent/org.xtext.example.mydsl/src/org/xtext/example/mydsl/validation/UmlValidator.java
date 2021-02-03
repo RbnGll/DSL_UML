@@ -34,6 +34,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	public static final String ENUM_VALUES_CAPITAL = "enumValueAllCaps";
 	public static final String DUPLICATE_ATTRIBUTES = "duplicateAttributes";
 	public static final String DUPLICATE_OBJECT_NAME= "duplicateObjectName";
+	public static final String DUPLICATE_FUNCTIONS = "duplicateFunctions";
 	
 	//
 	@Check
@@ -79,14 +80,14 @@ public class UmlValidator extends AbstractUmlValidator {
 		List<String> names = new ArrayList<>();
 		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
-			error("Duplicates in function field", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_FUNCTIONS);
 		}
 	}
 	
 	@Check
 	public void checkAbstractClassAttributesAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
-		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
+		c.getAttributes().forEach(att -> names.add(att.getName()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
 			error("All attributes should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__ATTRIBUTES, DUPLICATE_ATTRIBUTES);
 		}
@@ -95,10 +96,9 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkAbstractClassFunctionsAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
-		
-		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().toString()));
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
-			error("Duplicates in function field", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_FUNCTIONS);
 		}
 	}
 	
@@ -107,7 +107,7 @@ public class UmlValidator extends AbstractUmlValidator {
 		List<String> names = new ArrayList<>();
 		inter.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
-			error("Duplicates in function field", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_FUNCTIONS);
 		}
 	}
 	
