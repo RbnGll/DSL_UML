@@ -10,19 +10,18 @@ import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.validation.Check;
+import org.xtext.example.mydsl.uml.AbstractClass;
+import org.xtext.example.mydsl.uml.Class;
 import org.xtext.example.mydsl.uml.EnumConstant;
 import org.xtext.example.mydsl.uml.Extends;
+import org.xtext.example.mydsl.uml.FunctionParameter;
 import org.xtext.example.mydsl.uml.Implements;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Program;
 import org.xtext.example.mydsl.uml.Relation;
-import org.xtext.example.mydsl.uml.Statement;
 import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
-import org.xtext.example.mydsl.uml.AbstractClass;
-import org.xtext.example.mydsl.uml.Class;
-import org.xtext.example.mydsl.uml.Enum;
 
 /**
  * This class contains custom validation rules. 
@@ -78,16 +77,16 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkClassFunctionsAllDifferent(Class c) {
 		List<String> names = new ArrayList<>();
-		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
-			error("All functions should had different name in a same class", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
 	}
 	
 	@Check
 	public void checkAbstractClassAttributesAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
-		c.getAttributes().forEach(att -> names.add(att.getName()));
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
 			error("All attributes should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__ATTRIBUTES, DUPLICATE_ATTRIBUTES);
 		}
@@ -97,18 +96,18 @@ public class UmlValidator extends AbstractUmlValidator {
 	public void checkAbstractClassFunctionsAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
 		
-		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
-			error("All functions should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
 	}
 	
 	@Check
 	public void checkInterfaceFunctionsAllDifferent(Interface inter) {
 		List<String> names = new ArrayList<>();
-		inter.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
+		inter.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().stream().map(o -> ((FunctionParameter)o).getType()).collect(Collectors.toList()).toString()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
-			error("All functions should had different name in a same class", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+			error("Duplicates in function field", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
 	}
 	
