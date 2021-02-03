@@ -34,6 +34,7 @@ Customisation de la outline.
 - Utilisation d'un style pour les classes abstraites et les interfaces.
 - Mise en place d'une couleur spécifique en fonction de la visibilité des paramètres (privée, public...).
 - Affiche pour chaque fonction, la liste des paramètres utilisés.
+- Affiche les différentes relations avec le nom des objets impliqués.
 
 _Auteur: Régis Graptin_
 
