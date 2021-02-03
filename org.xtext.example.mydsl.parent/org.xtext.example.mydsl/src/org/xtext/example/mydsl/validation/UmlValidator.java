@@ -117,18 +117,18 @@ public class UmlValidator extends AbstractUmlValidator {
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getChildrenClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getChildrenClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass1();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
 			}
 		}
 	}
@@ -139,18 +139,18 @@ public class UmlValidator extends AbstractUmlValidator {
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getSuperClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getMotherClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass2();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 			}
 		}
 	}
