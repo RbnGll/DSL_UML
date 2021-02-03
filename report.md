@@ -14,7 +14,7 @@ Vérifie que :
 - les fonctions d'une classe ou d'une interface ne soient pas redondantes selon leur nom et leurs paramètres
 - lors d'un lien entre classe (héritage, association, etc.), les deux classes aient bien été instanciées
 
-Auteur: Robin Guill
+_Auteur: Robin Guill_
 
 ## [Outline](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.ui/src/org/xtext/example/mydsl/ui/outline/UmlOutlineTreeProvider.java)
 
@@ -28,7 +28,7 @@ Produit une proposition de modification lorsque:
 - l'entier d'un lien est négatif et propose de le passer en positif
 - une classe d'un lien n'est pas instancié et propose de la générer
 
-Auteur: Robin Guill
+_Auteur: Robin Guill_
 
 ## [Tests](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/tree/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.tests/src/org/xtext/example/mydsl/tests)
 
@@ -36,10 +36,11 @@ Auteur: Robin Guill
 
 Test unitaire sur le bon déroulement du parsing 
 
-Auteurs: Brieg Daniel, Régis Graptin, Robin Guill
+_Auteurs: Brieg Daniel, Régis Graptin, Robin Guill_
+
 ### Tests sur le générateur
 ### Tests sur le validateur
 
 Test unitaire sur la bonne validation du validateur
 
-Auteur: Robin Guill
+_Auteur: Robin Guill_
