@@ -60,7 +60,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkUmlObjectNamesAllDifferent(UmlObject umlobj) {
-		List<String> names = getNames(umlobj);
+		List<String> names = getUmlObjectsNames(umlobj);
 		if(Collections.frequency(names, umlobj.getName()) > 1) {
 			error("Object name must be unique", UmlPackage.Literals.UML_OBJECT__NAME, DUPLICATE_OBJECT_NAME);
 		}
@@ -113,7 +113,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass1ExistInLink(Link l) {
-		List<String> names = getNames(l);
+		List<String> names = getUmlObjectsNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getChildrenClass();
@@ -135,7 +135,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass2ExistInLink(Link l) {
-		List<String> names = getNames(l);
+		List<String> names = getUmlObjectsNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getSuperClass();
@@ -155,7 +155,7 @@ public class UmlValidator extends AbstractUmlValidator {
 		}
 	}
 	
-	public List<String> getNames(EObject object) {
+	public List<String> getUmlObjectsNames(EObject object) {
 		List<String> names = new ArrayList<>();
 		EObject container = object.eContainer();
 		while (!(container instanceof Program)) {
