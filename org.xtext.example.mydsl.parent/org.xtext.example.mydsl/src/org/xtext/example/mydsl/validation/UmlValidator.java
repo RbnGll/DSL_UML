@@ -15,7 +15,9 @@ import org.xtext.example.mydsl.uml.Extends;
 import org.xtext.example.mydsl.uml.Implements;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.Link;
+import org.xtext.example.mydsl.uml.Program;
 import org.xtext.example.mydsl.uml.Relation;
+import org.xtext.example.mydsl.uml.Statement;
 import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
 import org.xtext.example.mydsl.uml.AbstractClass;
@@ -32,8 +34,9 @@ public class UmlValidator extends AbstractUmlValidator {
 	public static final String UNDECLARED_CLASS = "undeclaredClass";
 	public static final String ENUM_VALUES_CAPITAL = "enumValueAllCaps";
 	public static final String DUPLICATE_ATTRIBUTES = "duplicateAttributes";
+	public static final String DUPLICATE_OBJECT_NAME= "duplicateObjectName";
 	
-	
+	//
 	@Check
 	public void checkInterfaceNameStartsWithCapital(UmlObject o) {
 	    if (!Character.isUpperCase(o.getName().charAt(0))) {
@@ -44,7 +47,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	}
 	
 	@Check
-    public void checkEnumValuesShouldBUpperCase(EnumConstant enumValue) {
+    public void checkEnumValuesShouldBeUpperCase(EnumConstant enumValue) {
 		Boolean bool = false;
 		String enumName = enumValue.getName();
         for (int i = 0; i < enumName.length(); i++) {
@@ -54,6 +57,14 @@ public class UmlValidator extends AbstractUmlValidator {
         }
         if (bool) warning("Enum constants names should be capitals", UmlPackage.Literals.ENUM_CONSTANT__NAME, ENUM_VALUES_CAPITAL);
     }
+	
+	@Check
+	public void checkUmlObjectNamesAllDifferent(UmlObject umlobj) {
+		List<String> names = getUmlObjectsNames(umlobj);
+		if(Collections.frequency(names, umlobj.getName()) > 1) {
+			error("Object name must be unique", UmlPackage.Literals.UML_OBJECT__NAME, DUPLICATE_OBJECT_NAME);
+		}
+	}
 	
 	@Check
 	public void checkClassAttributesAllDifferent(Class c) {
@@ -102,60 +113,57 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass1ExistInLink(Link l) {
-		List<String> names = new ArrayList<>();
-		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
-		umlObjects.forEach(o -> {
-			if (o instanceof Class) names.add(((Class)o).getName());
-			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
-			else if (o instanceof Interface) names.add(((Interface)o).getName());
-			else if (o instanceof Enum) names.add(((Enum)o).getName());
-		});
+		List<String> names = getUmlObjectsNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getChildrenClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getChildrenClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass1();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
 			}
 		}
 	}
 	
 	@Check
 	public void checkClass2ExistInLink(Link l) {
-		List<String> names = new ArrayList<>();
-		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
-		umlObjects.forEach(o -> {
-			if (o instanceof Class) names.add(((Class)o).getName());
-			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
-			else if (o instanceof Interface) names.add(((Interface)o).getName());
-			else if (o instanceof Enum) names.add(((Enum)o).getName());
-		});
+		List<String> names = getUmlObjectsNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getSuperClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getMotherClass();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass2();
-			if(Collections.frequency(names, className) > 1) {
-				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
+			if(!names.contains(className)) {
+				error("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 			}
 		}
+	}
+	
+	public List<String> getUmlObjectsNames(EObject object) {
+		List<String> names = new ArrayList<>();
+		EObject container = object.eContainer();
+		while (!(container instanceof Program)) {
+			container = container.eContainer();
+		}
+		Program program = (Program) container;
+		program.getCode().stream().filter(o -> o instanceof UmlObject).forEach(o -> names.add(((UmlObject)o).getName()));
+		return names;
 	}
 
 }

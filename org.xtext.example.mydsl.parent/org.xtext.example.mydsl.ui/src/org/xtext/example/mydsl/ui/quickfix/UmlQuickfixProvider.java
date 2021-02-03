@@ -63,19 +63,15 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		System.out.println(issue.getMessage());
 		if(issue.getMessage().contains("mismatched input '}' expecting 'attribute'")) {
 			toAdd =	""
-					+ "attribute {\n"
-					+ "}\n"
-					+ "function {\n"
-					+ "}"
+					+ "attribute {}\n"
+					+ "function {}\n"
 					+ "";
 			title = "Generate class content";
 			description = "Generate attributes and functions container";
 			charToChange = 0;
 			offset = issue.getLength();
 		}else if (issue.getMessage().equals("mismatched input '}' expecting 'function'")) {
-			toAdd="\n function {\n"
-					+ "}"
-					+ "";
+			toAdd="\n function {}\n";
 			title = "Generate function container";
 			description = "Generate missing functions container";
 			charToChange = 0;
@@ -85,7 +81,7 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 			title = "Autocomplete";
 			description = "";
 			charToChange = 0;
-			offset = issue.getLength();
+			offset = 1;
 		}else if (issue.getMessage().equals("extraneous input '-' expecting RULE_INT")) {
 			toAdd="";
 			title = "Use positive number";
@@ -107,6 +103,28 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 				try {
 				IXtextDocument xtextDocument= context.getXtextDocument();
 					xtextDocument.replace(issue.getOffset() - offset, charToChange, toAdd);
+				} catch (org.eclipse.jface.text.BadLocationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		
+	}
+	
+	@Fix(UmlValidator.UNDECLARED_CLASS)
+	public void generateUndeclaredClass(final Issue issue, IssueResolutionAcceptor acceptor){
+		acceptor.accept(issue, "Generate undeclared class", "", "", new IModification() {
+			public void apply(IModificationContext context) throws BadLocationException {
+				IXtextDocument xtextDocument = context.getXtextDocument();
+				String className;
+				try {
+					className = xtextDocument.get(issue.getOffset(), issue.getLength());
+					String generatedClass = "class "+className+"{\n"
+							+ "	attribute{}\n"
+							+ "	function{}\n"
+							+ "}\n\n";
+					xtextDocument.replace(0, 0, generatedClass);
 				} catch (org.eclipse.jface.text.BadLocationException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
