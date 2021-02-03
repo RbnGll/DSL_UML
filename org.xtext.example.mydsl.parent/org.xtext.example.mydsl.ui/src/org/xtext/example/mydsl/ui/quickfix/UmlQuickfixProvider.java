@@ -39,6 +39,23 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		});
 	}
 	
+	@Fix(UmlValidator.ENUM_VALUES_CAPITAL)
+	public void capitalizeEnumConstantsName(final Issue issue, IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Capitalize name", "Capitalize the name.", "upcase.png", new IModification() {
+			public void apply(IModificationContext context) throws BadLocationException {
+				IXtextDocument xtextDocument = context.getXtextDocument();
+				String word;
+				try {
+					word = xtextDocument.get(issue.getOffset(),issue.getLength());
+					xtextDocument.replace(issue.getOffset(), issue.getLength(), word.toUpperCase());
+				} catch (org.eclipse.jface.text.BadLocationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
 	@Fix(Diagnostic.SYNTAX_DIAGNOSTIC)
 	public void generateClassContent(final Issue issue, IssueResolutionAcceptor acceptor) {
 		String toAdd, title, description;
@@ -46,7 +63,7 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		System.out.println(issue.getMessage());
 		if(issue.getMessage().contains("mismatched input '}' expecting 'parameter'")) {
 			toAdd =	""
-					+ "parameter {\n"
+					+ "attribute {\n"
 					+ "}\n"
 					+ "function {\n"
 					+ "}"

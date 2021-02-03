@@ -3,14 +3,22 @@
  */
 package org.xtext.example.mydsl.validation;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.xtext.diagnostics.Diagnostic;
 import org.eclipse.xtext.validation.Check;
+import org.xtext.example.mydsl.uml.EnumConstant;
 import org.xtext.example.mydsl.uml.Extends;
 import org.xtext.example.mydsl.uml.Implements;
+import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.Relation;
 import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
+import org.xtext.example.mydsl.uml.AbstractClass;
+import org.xtext.example.mydsl.uml.Class;
 
 /**
  * This class contains custom validation rules. 
@@ -19,10 +27,9 @@ import org.xtext.example.mydsl.uml.UmlPackage;
  */
 public class UmlValidator extends AbstractUmlValidator {
 	public static final String INVALID_NAME = "invalidName";
-	public static final String INVALID_QUANTITY = "invalidQuantity";
 	public static final String UNDECLARED_CLASS = "undeclaredClass";
-	public static final String NO_CLASS_CONTENT = "noClassContent";
-	
+	public static final String ENUM_VALUES_CAPITAL = "enumValueAllCaps";
+	public static final String DUPLICATE_ATTRIBUTES = "duplicateAttributes";
 	
 	
 	
@@ -33,6 +40,63 @@ public class UmlValidator extends AbstractUmlValidator {
 	            UmlPackage.Literals.UML_OBJECT__NAME, // TODO :: Change value
 	            INVALID_NAME);
 	    }
+	}
+	
+	@Check
+    public void checkEnumValuesShouldBUpperCase(EnumConstant enumValue) {
+		Boolean bool = false;
+		String enumName = enumValue.getName();
+        for (int i = 0; i < enumName.length(); i++) {
+            if (!Character.isUpperCase(enumName.charAt(i))) {
+                bool = true;
+            }
+        }
+        if (bool) warning("Enum constants names should be capitals", UmlPackage.Literals.ENUM_CONSTANT__NAME, ENUM_VALUES_CAPITAL);
+    }
+	
+	@Check
+	public void checkClassAttributesAllDifferent(Class c) {
+		List<String> names = new ArrayList<>();
+		c.getAttributes().forEach(att -> names.add(att.getName()));
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+			error("All attributes should had different name in a same class", UmlPackage.Literals.CLASS__ATTRIBUTES, DUPLICATE_ATTRIBUTES);
+		}
+	}
+	
+	@Check
+	public void checkClassFunctionsAllDifferent(Class c) {
+		List<String> names = new ArrayList<>();
+		c.getFunctions().forEach(fun -> names.add(fun.getName()));
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+			error("All functions should had different name in a same class", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+		}
+	}
+	
+	@Check
+	public void checkAbstractClassAttributesAllDifferent(AbstractClass c) {
+		List<String> names = new ArrayList<>();
+		c.getAttributes().forEach(att -> names.add(att.getName()));
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+			error("All attributes should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__ATTRIBUTES, DUPLICATE_ATTRIBUTES);
+		}
+	}
+	
+	@Check
+	public void checkClassFunctionsAllDifferent(AbstractClass c) {
+		List<String> names = new ArrayList<>();
+		c.getFunctions().forEach(fun -> names.add(fun.getName()));
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+			error("All functions should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+		}
+	}
+	
+	@Check
+	public void checkInterfaceFunctionsAllDifferent(Interface inter) {
+		List<String> names = new ArrayList<>();
+		inter.getFunctions().forEach(fun -> names.add(fun.getName()));
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+			error("All functions should had different name in a same class", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
+		}
 	}
 	
 	@Check
