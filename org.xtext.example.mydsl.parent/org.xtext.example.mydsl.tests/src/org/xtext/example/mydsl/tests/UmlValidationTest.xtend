@@ -31,7 +31,18 @@ class UmlValidationTest {
 	
 	@Test
     def void TestEnumValuesShouldBeUpperCaseTest() {
-    	assertFalse(true)
+    	result = parseHelper.parse('''
+				enum Foo {
+					FOO;
+					Bar;
+					foo;
+					bAR;
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertNumberOfIssues(3)				
+			result.assertWarning(UmlPackage.Literals.ENUM_CONSTANT,UmlValidator.ENUM_VALUES_CAPITAL)
+			
     }
 	
 	@Test
@@ -72,5 +83,9 @@ class UmlValidationTest {
 	@Test
 	def void TestClass2ExistInLinkTest() {
 		assertFalse(true)
+	}
+	
+	private def assertNumberOfIssues(Program program, int expectedNumberOfIssues) {
+		Assertions.assertEquals(expectedNumberOfIssues, program.validate.size)
 	}
 }
