@@ -78,7 +78,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkClassFunctionsAllDifferent(Class c) {
 		List<String> names = new ArrayList<>();
-		c.getFunctions().forEach(fun -> names.add(fun.getName()));
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
 			error("All functions should had different name in a same class", UmlPackage.Literals.CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
@@ -94,9 +94,10 @@ public class UmlValidator extends AbstractUmlValidator {
 	}
 	
 	@Check
-	public void checkClassFunctionsAllDifferent(AbstractClass c) {
+	public void checkAbstractClassFunctionsAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
-		c.getFunctions().forEach(fun -> names.add(fun.getName()));
+		
+		c.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
 			error("All functions should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
@@ -105,7 +106,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	@Check
 	public void checkInterfaceFunctionsAllDifferent(Interface inter) {
 		List<String> names = new ArrayList<>();
-		inter.getFunctions().forEach(fun -> names.add(fun.getName()));
+		inter.getFunctions().forEach(fun -> names.add(fun.getName()+fun.getParams().size()));
 		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
 			error("All functions should had different name in a same class", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
