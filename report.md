@@ -1,6 +1,17 @@
 # Travail réalisé
 
+Pour comprendre l'utilisation du projet, vous pouvez aller voir la documentation directement sur le fichier *README.md*.
+
 ## [Grammaire](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl/src/org/xtext/example/mydsl/Uml.xtext)
+
+- Définition de l'ensemble des types d'objets (*Class*, *Interface*, *Abstract Class*, *Enum*)
+- Définition des fonctions (visibilité, type de retour, nom, paramètres)
+- Définition des paramètres (visibilité, type, nom)
+- Ajout de mot-clés possible : *final*, *static*, *abstract*(uniquement pour les classes abstraites)
+- Définition des différentes relations possibles (implémentation, héritage, association)
+- Définition du package (pour regrouper les classes dans un même package)
+
+_Auteurs: Brieg Daniel, Régis Graptin_
 
 ## [Générateur](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl/src/org/xtext/example/mydsl/generator/UmlGenerator.xtend)
 
@@ -18,6 +29,14 @@ _Auteur: Robin Guill_
 
 ## [Outline](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.ui/src/org/xtext/example/mydsl/ui/outline/UmlOutlineTreeProvider.java)
 
+Customisation de la outline.
+- Utilisation des noms des éléments correspondants (utilisation des noms des classes, du nom de l'énumération...)
+- Utilisation d'un style pour les classes abstraites et les interfaces.
+- Mise en place d'une couleur spécifique en fonction de la visibilité des paramètres (privée, public...).
+- Affiche pour chaque fonction, la liste des paramètres utilisés.
+
+_Auteur: Régis Graptin_
+
 ## [Quickfixes](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl.ui/src/org/xtext/example/mydsl/ui/quickfix/UmlQuickfixProvider.java)
 
 Produit une proposition de modification lorsque: 
@@ -34,7 +53,7 @@ _Auteur: Robin Guill_
 
 ### Tests sur le parsing
 
-Test unitaire sur le bon déroulement du parsing 
+Tests unitaires sur le bon déroulement du parsing.
 
 _Auteurs: Brieg Daniel, Régis Graptin, Robin Guill_
 
