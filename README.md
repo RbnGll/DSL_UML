@@ -54,10 +54,10 @@ class Test {
 ### Visibilité
 
 Pour la visibilité, 4 niveaux sont disponibles :
-- - : privé
-- # : protected
-- ~ : package
-- + : public
+- '-' : privé
+- '#' : protected
+- '~' : package
+- '+' : public
 
 ### Classe abstraite
 
@@ -93,7 +93,37 @@ interface Union {
 ## Les relations entre les objets
 
 
+### L'héritage
 
+L'héritage entre deux classes s'éxprime par : 
+
+```
+extends(Parent, Child);
+```
+
+### L'association 
+
+
+```
+association(Class1, Class2, nameRelation, 10, 20);
+```
+
+
+### Association forte
+```
+strongAssociation(Class1, Class2, 20);
+```
+
+
+## Package
+Définition d'un package.
+
+```
+package NomDuPackage {
+	Class1,
+	Class2
+}
+```
 
 
 
