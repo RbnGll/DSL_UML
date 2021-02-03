@@ -23,10 +23,12 @@ import org.xtext.example.mydsl.uml.Enum;
 import org.xtext.example.mydsl.uml.Extends;
 import org.xtext.example.mydsl.uml.Function;
 import org.xtext.example.mydsl.uml.FunctionParameter;
+import org.xtext.example.mydsl.uml.Implements;
 import org.xtext.example.mydsl.uml.Interface;
 import org.xtext.example.mydsl.uml.InterfaceFunction;
 import org.xtext.example.mydsl.uml.Link;
 import org.xtext.example.mydsl.uml.StaticAttribute;
+import org.xtext.example.mydsl.uml.StrongAggregation;
 
 
 
@@ -37,36 +39,89 @@ import org.xtext.example.mydsl.uml.StaticAttribute;
  */
 public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 
+	
+	/**
+	 * Define the color used in function of the visibility set.
+	 */
 	private static final RGB VISIBILITY_COLOR_PUBLIC = new RGB(0, 255, 127);		// #00ff7f 
 	private static final RGB VISIBILITY_COLOR_PRIVATE = new RGB(236, 70, 70);		// #ec4646
 	private static final RGB VISIBILITY_COLOR_PROTECTED = new RGB(72, 126, 149);  	// #487e95
 	
 
+	/**
+	 * StyleFactor : use to inject the style on the display name.
+	 */
 	@Inject 
 	private StylerFactory stylerFactory;
 
-	
-	
+	/**
+	 * Link object.
+	 * @param l
+	 * @return
+	 */
 	public Object _text(Link l) {
 		return "Link";
 	}
 
+	/**
+	 * Use the name of the class.
+	 * @param c
+	 * @return
+	 */
 	public Object _text(Class c) {
 		return c.getName();
 	}
-
+	
+	/**
+	 * Use the name of the enum
+	 * @param c
+	 * @return
+	 */
 	public Object _text(Enum c) {
 		return c.getName();
 	}
 
+	/**
+	 * Use the name of the abstract class.
+	 * Add additional style.
+	 * @param c
+	 * @return
+	 */
 	public Object _text(AbstractClass c) {
 		TextStyle abstractStyle = abstractClassStyle();
 		return new StyledString(c.getName(), stylerFactory.createXtextStyleAdapterStyler(abstractStyle));
 	}
 
+	/**
+	 * Abstract class UML :
+	 * - Italics
+	 * @return
+	 */
+	private TextStyle abstractClassStyle() {
+		TextStyle textStyle = new TextStyle();
+		textStyle.setStyle(SWT.ITALIC);
+		return textStyle;
+	}
+	
+	/**
+	 * Use interface name.
+	 * Add additional style.
+	 * @param c
+	 * @return
+	 */
 	public Object _text(Interface c) {
 		TextStyle interfaceStyle = interfaceStyle();
 		return new StyledString(c.getName(), stylerFactory.createXtextStyleAdapterStyler(interfaceStyle));
+	}
+	
+	/**
+	 * Interface style 
+	 * @return
+	 */
+	private TextStyle interfaceStyle() {
+		TextStyle textStyle = new TextStyle();
+		textStyle.setStyle(SWT.BORDER);
+		return textStyle;
 	}
 
 
@@ -96,8 +151,11 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 	
 	
-	
-	
+	/**
+	 * Define the style and the name for the function
+	 * @param function
+	 * @return
+	 */
 	public Object _text(Function function) {
 		return this.getStyleForFunction(function.getName(), function.getVisibility(), function.getParams(), function.getReturnType());
 	}
@@ -203,62 +261,38 @@ public class UmlOutlineTreeProvider extends DefaultOutlineTreeProvider {
 	}
 
 
-
-
-
 	// Links
-
 	public Object _text(Extends c) {
-		return "Extends";
+		return c.getChildrenClass() + " extends " +  c.getSuperClass(); 
 	}
 
+	public Object _text(Implements c) {
+		return c.getMotherClass() + " implements " + c.getMotherClass();
+	}
+
+	public Object _text(StrongAggregation c) {
+		return c.getNameClass1() + " strongly associate with " + c.getNameClass2();
+	}
+	
 	public Object _text(Association c) {
-		return "Association";
-	}
-
-
-
-
-
-
-	/**
-	 * Abstract class UML :
-	 * - Italics
-	 * @return
-	 */
-	private TextStyle abstractClassStyle() {
-		TextStyle textStyle = new TextStyle();
-		textStyle.setStyle(SWT.ITALIC);
-		return textStyle;
-	}
-
-	/**
-	 * Interface 
-	 * @return
-	 */
-	private TextStyle interfaceStyle() {
-		TextStyle textStyle = new TextStyle();
-		textStyle.setStyle(SWT.BORDER);
-		return textStyle;
+		return c.getNameClass1() + " associate with " + c.getNameClass2();
 	}
 
 	
-	
-	
-
-	@Inject
-	private PluginImageHelper imageHelper;
-
-	/**
-	 * TODO :: Problem reading image, maybe the source file is not available for eclipse :'(
-	 * 
-	 * @param c
-	 * @return
-	 */
-	public ImageDescriptor _image(Class c) {
-		return imageHelper.getImageDescriptor("icons/metadata.png");
-	}
-
+//	@Inject
+//	private PluginImageHelper imageHelper;
+//
+//	
+//	/**
+//	 * Problem reading image. The eclipse don't find the path of the image, or can't read the image 
+//	 * 
+//	 * @param c
+//	 * @return
+//	 */
+//	public ImageDescriptor _image(Class c) {
+//		return imageHelper.getImageDescriptor("icons/metadata.png");
+//	}
+//
 
 
 }
