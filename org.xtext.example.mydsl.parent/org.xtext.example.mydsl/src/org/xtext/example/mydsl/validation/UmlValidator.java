@@ -60,13 +60,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkUmlObjectNamesAllDifferent(UmlObject umlobj) {
-		List<String> names = new ArrayList<>();
-		EObject container = umlobj.eContainer();
-		while (!(container instanceof Program)) {
-			container = container.eContainer();
-		}
-		Program program = (Program) container;
-		program.getCode().stream().filter(o -> o instanceof UmlObject).forEach(o -> names.add(((UmlObject)o).getName()));
+		List<String> names = getNames(umlobj);
 		if(Collections.frequency(names, umlobj.getName()) > 1) {
 			error("Object name must be unique", UmlPackage.Literals.UML_OBJECT__NAME, DUPLICATE_OBJECT_NAME);
 		}
@@ -119,14 +113,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass1ExistInLink(Link l) {
-		List<String> names = new ArrayList<>();
-		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
-		umlObjects.forEach(o -> {
-			if (o instanceof Class) names.add(((Class)o).getName());
-			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
-			else if (o instanceof Interface) names.add(((Interface)o).getName());
-			else if (o instanceof Enum) names.add(((Enum)o).getName());
-		});
+		List<String> names = getNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getChildrenClass();
@@ -148,14 +135,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass2ExistInLink(Link l) {
-		List<String> names = new ArrayList<>();
-		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
-		umlObjects.forEach(o -> {
-			if (o instanceof Class) names.add(((Class)o).getName());
-			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
-			else if (o instanceof Interface) names.add(((Interface)o).getName());
-			else if (o instanceof Enum) names.add(((Enum)o).getName());
-		});
+		List<String> names = getNames(l);
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getSuperClass();
@@ -173,6 +153,17 @@ public class UmlValidator extends AbstractUmlValidator {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 			}
 		}
+	}
+	
+	public List<String> getNames(EObject object) {
+		List<String> names = new ArrayList<>();
+		EObject container = object.eContainer();
+		while (!(container instanceof Program)) {
+			container = container.eContainer();
+		}
+		Program program = (Program) container;
+		program.getCode().stream().filter(o -> o instanceof UmlObject).forEach(o -> names.add(((UmlObject)o).getName()));
+		return names;
 	}
 
 }
