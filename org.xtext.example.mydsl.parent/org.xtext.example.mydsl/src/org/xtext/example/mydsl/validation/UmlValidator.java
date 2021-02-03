@@ -6,8 +6,9 @@ package org.xtext.example.mydsl.validation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.eclipse.xtext.diagnostics.Diagnostic;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.validation.Check;
 import org.xtext.example.mydsl.uml.EnumConstant;
 import org.xtext.example.mydsl.uml.Extends;
@@ -19,6 +20,7 @@ import org.xtext.example.mydsl.uml.UmlObject;
 import org.xtext.example.mydsl.uml.UmlPackage;
 import org.xtext.example.mydsl.uml.AbstractClass;
 import org.xtext.example.mydsl.uml.Class;
+import org.xtext.example.mydsl.uml.Enum;
 
 /**
  * This class contains custom validation rules. 
@@ -32,12 +34,11 @@ public class UmlValidator extends AbstractUmlValidator {
 	public static final String DUPLICATE_ATTRIBUTES = "duplicateAttributes";
 	
 	
-	
 	@Check
 	public void checkInterfaceNameStartsWithCapital(UmlObject o) {
 	    if (!Character.isUpperCase(o.getName().charAt(0))) {
 	        warning("Name should start with a capital",
-	            UmlPackage.Literals.UML_OBJECT__NAME, // TODO :: Change value
+	            UmlPackage.Literals.UML_OBJECT__NAME,
 	            INVALID_NAME);
 	    }
 	}
@@ -85,7 +86,7 @@ public class UmlValidator extends AbstractUmlValidator {
 	public void checkClassFunctionsAllDifferent(AbstractClass c) {
 		List<String> names = new ArrayList<>();
 		c.getFunctions().forEach(fun -> names.add(fun.getName()));
-		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
 			error("All functions should had different name in a same class", UmlPackage.Literals.ABSTRACT_CLASS__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
 	}
@@ -94,27 +95,35 @@ public class UmlValidator extends AbstractUmlValidator {
 	public void checkInterfaceFunctionsAllDifferent(Interface inter) {
 		List<String> names = new ArrayList<>();
 		inter.getFunctions().forEach(fun -> names.add(fun.getName()));
-		if(names.stream().anyMatch(i -> Collections.frequency(names, i) >1)) {
+		if(names.stream().anyMatch(i -> Collections.frequency(names, i) > 1)) {
 			error("All functions should had different name in a same class", UmlPackage.Literals.INTERFACE__FUNCTIONS, DUPLICATE_ATTRIBUTES);
 		}
 	}
 	
 	@Check
 	public void checkClass1ExistInLink(Link l) {
+		List<String> names = new ArrayList<>();
+		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
+		umlObjects.forEach(o -> {
+			if (o instanceof Class) names.add(((Class)o).getName());
+			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
+			else if (o instanceof Interface) names.add(((Interface)o).getName());
+			else if (o instanceof Enum) names.add(((Enum)o).getName());
+		});
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getChildrenClass();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {//TODO find good if
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getChildrenClass();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__CHILDREN_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass1();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS1, UNDECLARED_CLASS);
 			}
 		}
@@ -122,20 +131,28 @@ public class UmlValidator extends AbstractUmlValidator {
 	
 	@Check
 	public void checkClass2ExistInLink(Link l) {
+		List<String> names = new ArrayList<>();
+		List<EObject> umlObjects = l.eContainer().eContents().stream().filter(obj -> obj instanceof UmlObject).collect(Collectors.toList());
+		umlObjects.forEach(o -> {
+			if (o instanceof Class) names.add(((Class)o).getName());
+			else if (o instanceof AbstractClass) names.add(((AbstractClass)o).getName());
+			else if (o instanceof Interface) names.add(((Interface)o).getName());
+			else if (o instanceof Enum) names.add(((Enum)o).getName());
+		});
 		String className;
 		if (l instanceof Extends) {
 			className = ((Extends)l).getSuperClass();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.EXTENDS__SUPER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Implements){
 			className =((Implements)l).getMotherClass();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.IMPLEMENTS__MOTHER_CLASS, UNDECLARED_CLASS);
 			}
 		}else if (l instanceof Relation){
 			className =((Relation)l).getNameClass2();
-			if(!Diagnostic.LINKING_DIAGNOSTIC.contains(className)) {
+			if(Collections.frequency(names, className) > 1) {
 				warning("Class '"+ className + "' have not been declared", UmlPackage.Literals.RELATION__NAME_CLASS2, UNDECLARED_CLASS);
 			}
 		}

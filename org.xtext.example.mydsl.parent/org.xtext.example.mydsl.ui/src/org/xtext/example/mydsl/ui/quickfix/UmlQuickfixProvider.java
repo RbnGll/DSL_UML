@@ -61,7 +61,7 @@ public class UmlQuickfixProvider extends DefaultQuickfixProvider {
 		String toAdd, title, description;
 		int charToChange, offset;
 		System.out.println(issue.getMessage());
-		if(issue.getMessage().contains("mismatched input '}' expecting 'parameter'")) {
+		if(issue.getMessage().contains("mismatched input '}' expecting 'attribute'")) {
 			toAdd =	""
 					+ "attribute {\n"
 					+ "}\n"
