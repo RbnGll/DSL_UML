@@ -1,13 +1,17 @@
 package org.xtext.example.mydsl.tests
 
-import org.junit.jupiter.api.^extension.ExtendWith
+import javax.inject.Inject
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
-import javax.inject.Inject
 import org.eclipse.xtext.testing.util.ParseHelper
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
-import org.xtext.example.mydsl.uml.Program
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.^extension.ExtendWith
+import org.xtext.example.mydsl.uml.Program
+import org.xtext.example.mydsl.uml.UmlPackage
+import org.xtext.example.mydsl.validation.UmlValidator
+
 import static org.junit.Assert.assertFalse
 
 @ExtendWith(InjectionExtension)
@@ -19,52 +23,153 @@ class UmlValidationTest {
 	
 	@Test
 	def void TestInterfaceNameStartsWithCapitalTest() {
-			assertFalse(true)
+			result = parseHelper.parse('''
+				interface foo {function{}}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertWarning(UmlPackage.Literals.INTERFACE,UmlValidator.INVALID_NAME)
 	}
 	
 	@Test
     def void TestEnumValuesShouldBeUpperCaseTest() {
-    			assertFalse(true)
+    	result = parseHelper.parse('''
+				enum Foo {
+					FOO;
+					Bar;
+					foo;
+					bAR;
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertNumberOfIssues(3)				
+			result.assertWarning(UmlPackage.Literals.ENUM_CONSTANT,UmlValidator.ENUM_VALUES_CAPITAL)
+			
     }
 	
 	@Test
 	def void TestUmlObjectNamesAllDifferentTest() {
-				assertFalse(true)
-
+		result = parseHelper.parse('''
+				class Foo {
+					attribute{}
+					function{}
+				}
+				
+				interface Foo{
+					function{}
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertError(UmlPackage.Literals.UML_OBJECT, UmlValidator.DUPLICATE_OBJECT_NAME)
 	}
 	
 	@Test
 	def void TestClassAttributesAllDifferentTest() {
-				assertFalse(true)
+		result = parseHelper.parse('''
+				class Foo {
+					attribute{
+						+ int foo;
+						+ int foo;
+					}
+					function{}
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertError(UmlPackage.Literals.CLASS, UmlValidator.DUPLICATE_ATTRIBUTES)
 	}
 	
 	@Test
 	def void TestClassFunctionsAllDifferentTest() {
-		assertFalse(true)
+		result = parseHelper.parse('''
+				class Foo {
+					attribute{}
+					function{
+						+ void test();
+						+ void test(int a);
+						+ void test();
+					}
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertNumberOfIssues(1)
+			result.assertError(UmlPackage.Literals.CLASS, UmlValidator.DUPLICATE_FUNCTIONS)
 	}
 	
 	@Test
 	def void TestAbstractClassAttributesAllDifferentTest() {
-		assertFalse(true)
+		result = parseHelper.parse('''
+				abstract class Foo {
+									attribute{
+										+ int foo;
+										+ int foo;
+									}
+									function{}
+								}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertError(UmlPackage.Literals.ABSTRACT_CLASS, UmlValidator.DUPLICATE_ATTRIBUTES)
 	}
 	
 	@Test
 	def void TestAbstractClassFunctionsAllDifferentTest() {
-		assertFalse(true)
+		result = parseHelper.parse('''
+				abstract class Foo {
+					attribute{}
+					function{
+						+ void test();
+						+ void test(int a);
+						+ void test();
+					}
+				}
+			''')
+			Assertions.assertNotNull(result)
+			//result.assertNumberOfIssues(1)
+			result.assertError(UmlPackage.Literals.ABSTRACT_CLASS, UmlValidator.DUPLICATE_FUNCTIONS)
 	}
 	
 	@Test
 	def void TestInterfaceFunctionsAllDifferentTest() {
-		assertFalse(true)		
+		result = parseHelper.parse('''
+				interface Foo {
+					function{
+						+ void test();
+						+ void test(int a);
+						+ void test();
+					}
+				}
+			''')
+			Assertions.assertNotNull(result)
+			result.assertNumberOfIssues(1)
+			result.assertError(UmlPackage.Literals.INTERFACE, UmlValidator.DUPLICATE_FUNCTIONS)	
 	}
 	
 	@Test
 	def void TestClass1ExistInLinkTest() {
-		assertFalse(true)		
+		result = parseHelper.parse('''
+				abstract class Foo {
+					attribute{}
+					function{}
+				}
+				extends(Bar, Foo)
+			''')
+			Assertions.assertNotNull(result)
+			result.assertError(UmlPackage.Literals.LINK, UmlValidator.UNDECLARED_CLASS)
+				
 	}
 	
 	@Test
 	def void TestClass2ExistInLinkTest() {
-		assertFalse(true)
+		result = parseHelper.parse('''
+				abstract class Foo {
+					attribute{}
+					function{}
+				}
+				extends(Foo, Bar)
+			''')
+			Assertions.assertNotNull(result)
+			result.assertError(UmlPackage.Literals.LINK, UmlValidator.UNDECLARED_CLASS)
+	}
+	
+	private def assertNumberOfIssues(Program program, int expectedNumberOfIssues) {
+		Assertions.assertEquals(expectedNumberOfIssues, program.validate.size)
 	}
 }
