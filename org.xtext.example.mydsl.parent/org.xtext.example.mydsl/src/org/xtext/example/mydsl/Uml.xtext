@@ -3,20 +3,19 @@ grammar org.xtext.example.mydsl.Uml with org.eclipse.xtext.common.Terminals
 generate uml "http://www.xtext.org/example/mydsl/Uml"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
-// TODO
-/*
- * Add modifiers management on umlObjects
- * Add modifier static to functions
- */
-
+// https://www.uml-diagrams.org/class-reference.html
 
 Program:
 	(code+=Statement)*;
 
+/**
+ * Define the three main types of the language.
+ */
 Statement:
 	Link | UmlObject | Package;
 	
 	
+
 // LINKS
 Link:
 	Extends | Implements | Relation; 
@@ -25,24 +24,36 @@ Link:
 Relation:
 	StrongAggregation | Association;
 
-	
+/**
+ * Implementation of an interface.
+ */	
 Implements: 
 	'implements' '(' motherClass=ID ',' childrenClass=ID ')' ';'
 ;
 	
+/**
+ * Heritage between two classes.
+ */
 Extends:
 	'extends' '(' superClass=ID ',' childrenClass=ID ')' ';'
 ;
 
-
-// Voir si on a d'autres paramètres ou des paramètres vides
+/**
+ * Association between two classes. 
+ * Set the name of the relation and the corresponding quantity.
+ */
 Association: 
 	'association' '(' nameClass1=ID ',' nameClass2=ID ',' nameLiaison=ID ',' quantity1=INT ',' quantity2=INT ')' ';'
 ;
 
+/**
+ * Strong association. 
+ * Same principle than association.
+ */
 StrongAggregation:
 	'strongAssociation' '(' nameClass1=ID ',' nameClass2=ID ',' nameLiaison=ID ',' quantity2=INT ')' ';'
 ;
+
 
 
 // OBJECTS
@@ -53,7 +64,59 @@ UmlObject:
 
 
 
-// Keep the parameter and the function
+/**
+ * Definition of a parameter.
+ */  
+DefinedAttribute: StaticAttribute | ClassicAttribute;
+
+
+/**
+ * For a classic attribute, we ask the visibility, the type and the name.
+ * Possibly the key word 'final'.
+ */
+ClassicAttribute: visibility=VISIBILITY final=FINAL? type=ID name=ID ';';
+
+/**
+ * Static attributes have the 'static' defined.
+ */
+StaticAttribute: visibility=VISIBILITY static=STATIC final=FINAL? type=ID name=ID ';';
+
+
+/**
+ * Here, we defined a function parameter used in function description.
+ */
+FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
+
+
+// Do not delete as it is used in the generator to process parameters in a generic way.
+Function: 
+	ClassicFunction | AbstractFunction | InterfaceFunction
+;
+
+/**
+ * Classical function. 
+ * We set the visibility, the return type and the name of the function.
+ */
+ClassicFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
+	(params+=FunctionParameter ','?)* // Here * --> 0 or more	
+')' ';';
+
+/**
+ * Specific function used in abstract class.
+ * As you can see, we have the possibility to add the keyword 'abstract'.
+ */
+AbstractFunction: visibility=VISIBILITY abstract=ABSTRACT? static=STATIC? final=FINAL? returnType=ID name=ID'(' 
+	(params+=FunctionParameter ','?)* 	
+')' ';'
+;
+
+
+/**
+ * Define a class.
+ * Here, we have two fields.
+ * - Attribute : use to define the attribute of the class.
+ * - Functions : use to define the function of the class.
+ */
 Class: 'class' name=ID '{'
     'attribute' '{'
         (attributes+=DefinedAttribute)*
@@ -64,7 +127,9 @@ Class: 'class' name=ID '{'
 '}';
 
 
-
+/**
+ * Abstract class.
+ */
 AbstractClass: abstract=ABSTRACT 'class' name=ID '{'
 	'attribute' '{'
 		(attributes+=DefinedAttribute)*
@@ -76,7 +141,9 @@ AbstractClass: abstract=ABSTRACT 'class' name=ID '{'
 ;
 
 
-// https://www.uml-diagrams.org/class-reference.html
+/**
+ * Interface
+ */
 Interface: 'interface' name=ID '{'
 	'function' '{'
 		(functions+=InterfaceFunction)*
@@ -84,60 +151,57 @@ Interface: 'interface' name=ID '{'
 '}'
 ;
 
-
-
-
-// Definition of a parameter 
-DefinedAttribute: StaticAttribute | ClassicAttribute;
-
-StaticAttribute: visibility=VISIBILITY static=STATIC final=FINAL? type=ID name=ID ';';
-
-ClassicAttribute: visibility=VISIBILITY final=FINAL? type=ID name=ID ';';
-
-FunctionParameter: visibility=VISIBILITY? final=FINAL? type=ID name=ID;
-
-// Do not delete as it is used in the generator to process parameters in a generic way
-Function: 
-	ClassicFunction | AbstractFunction | InterfaceFunction
-;
-
-ClassicFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
-	(params+=FunctionParameter ','?)* // Here * --> 0 or more	
-')' ';';
-
-AbstractFunction: visibility=VISIBILITY abstract=ABSTRACT? static=STATIC? final=FINAL? returnType=ID name=ID'(' 
-	(params+=FunctionParameter ','?)* 	
-')' ';'
-;
-
-
+/**
+ * Interface function.
+ */
 InterfaceFunction: visibility=VISIBILITY static=STATIC? final=FINAL? returnType=ID name=ID'(' 
 	(params+=FunctionParameter ','?)* 	
 ')' ';';
 
 
+/**
+ * Enumeration
+ */
 Enum: 'enum' name=ID '{' 
 	(params+=EnumConstant)+	
 '}';
 
+/**
+ * Define the value in the enumeration.
+ */
 EnumConstant: name=ID ';';
 
-// TODO :: Je crois que l'on doit rajouter dans le style que le nom du package doit être définie soit pas une classe ou un nom de package précédement créé.
+
+// PACKAGE
+/**
+ * Definition of a package.
+ * Take a list of objects.
+ */
 Package: 'package' name=ID '{' 
 	(packageName+=ID ','?)+
 '}';
 
 
+/**
+ * Visibility : public, private, protected, package 
+ */
 terminal VISIBILITY returns ecore::EChar: 
 	'+' | '-' | '#' | '~';
 
+/**
+ * Keyword final.
+ */
 terminal FINAL returns ecore::EString:
 	'final';
 
+/**
+ * Keyword static.
+ */
 terminal STATIC returns ecore::EString:
 	'static';
 
+/**
+ * Keyword abstract.
+ */
 terminal ABSTRACT returns ecore::EString:
 	'abstract';
-
-	
