@@ -36,7 +36,7 @@ class Test {
 		+ int a;
 		- String b;
 		# static int ;
-		~ final String v;
+		+ final String v;
 	}
 	function {
 		+ void generate();
@@ -49,10 +49,9 @@ class Test {
 
 ### Visibilité
 
-Pour la visibilité, 4 niveaux sont disponibles :
+Pour la visibilité, 3 niveaux sont disponibles :
 - '-' : privé
 - '#' : protégé
-- '~' : package
 - '+' : public
 
 ### Classe abstraite
@@ -65,7 +64,7 @@ abstract class Abstraction {
 		- String name;
 	}
 	function {
-		~ abstract int elementaire();
+		# abstract int elementaire();
 		+ String hello();
 	}
 }

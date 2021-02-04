@@ -11,10 +11,17 @@ Pour comprendre l'utilisation du projet, vous pouvez aller voir la documentation
 - Définition des différentes relations possibles (implémentation, héritage, association)
 - Définition du package (pour regrouper les classes dans un même package)
 
-_Auteurs: Brieg Daniel, Régis Graptin_
+_Auteurs: Régis Graptin, Brieg Daniel_
 
 ## [Générateur](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl/src/org/xtext/example/mydsl/generator/UmlGenerator.xtend)
 
+- Génération des fichiers java
+- Prise en charges des différents Liens entre les objets Java 
+- Génération du squelette des objets Java correspondants
+- Prise en charge des Enum, Class, Abstract Class, Interface
+- Implémentation automatique des méthodes d'interface implémentées
+
+_Auteur: Brieg Daniel_
 ## [Validation](https://gitlab.insa-rennes.fr/Regis.Graptin/dsl-uml/-/blob/master/org.xtext.example.mydsl.parent/org.xtext.example.mydsl/src/org/xtext/example/mydsl/validation/UmlValidator.java)
 
 Vérifie que :
@@ -59,6 +66,9 @@ Tests unitaires sur le bon déroulement du parsing.
 _Auteurs: Brieg Daniel, Régis Graptin, Robin Guill_
 
 ### Tests sur le générateur
+Tests unitaires sur la validité du code généré.
+
+_Auteurs: Brieg Daniel_
 ### Tests sur le validateur
 
 Test unitaire sur la bonne validation du validateur
