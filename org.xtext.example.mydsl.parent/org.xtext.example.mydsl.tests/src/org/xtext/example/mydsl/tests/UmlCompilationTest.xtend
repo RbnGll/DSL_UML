@@ -47,6 +47,7 @@ class UmlCompilationTest {
 					+ int publicInt;
 					- int privateInt;
 					# int protectedInt;
+					~ int packageInt;
 				}
 				function{}
 		'''.assertCompilesTo('''
@@ -54,6 +55,7 @@ class UmlCompilationTest {
 				public int publicInt;
 				private int privateInt;
 				protected int protectedInt;
+				package int packageInt;
 			}''')
 	}
 	
@@ -157,6 +159,7 @@ class UmlCompilationTest {
 					+ void publicFunction();
 					- void privateFunction();
 					# void protectedFunction();
+					~ void packageFunction();
 				}
 			}
 		'''.assertCompilesTo('''
@@ -168,6 +171,9 @@ class UmlCompilationTest {
 					// TODO - Auto generated method
 				}
 				protected void protectedFunction(){
+					// TODO - Auto generated method
+				}
+				package void packageFunction(){
 					// TODO - Auto generated method
 				}
 			}''')

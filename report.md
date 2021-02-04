@@ -74,3 +74,11 @@ _Auteurs: Brieg Daniel_
 Test unitaire sur la bonne validation du validateur
 
 _Auteur: Robin Guill_
+
+### Futurs développements 
+Tout d'abord il y a des points sur lesquels nous avons du nous concentrer et nous avons donc délaissés certaines fonctionnalités qu'il reviendrait de prendre en charge : 
+ - Gestion des packages
+ - Gestion des associations
+ - 
+
+De plus, la spécification UML est extrêmement riche, il y aurait donc encore de nombreux points à améliorer avec notre langage.
